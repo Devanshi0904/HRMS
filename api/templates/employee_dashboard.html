@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Employee Dashboard - HRMS{% endblock %}
+
+{% block content %}
+<style>
+    .sidebar {
+        display: none !important;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 30px !important;
+        background: #f8fafc;
+        min-height: 100vh;
+    }
+
+    /* Page Header Card */
+    .dashboard-header-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 24px 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+        margin-bottom: 25px;
+    }
+
+    h3,
+    h4 {
+        color: #1e293b;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    /* Modern Navigation Tabs */
+    .nav-tabs-custom {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+    .nav-tabs-custom .btn {
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 14.5px;
+        transition: all 0.3s ease;
+        border: 1.5px solid #e2e8f0;
+        background: #ffffff;
+        color: #475569;
+    }
+
+    .nav-tabs-custom .btn.active,
+    .nav-tabs-custom .btn:hover {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: #ffffff;
+        border-color: transparent;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        transform: translateY(-2px);
+    }
+
+    /* Cards Styling */
+    .card {
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 20px !important;
+        background: #ffffff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02) !important;
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: #0f172a !important;
+        color: #ffffff !important;
+        padding: 18px 24px;
+        font-weight: 700;
+        font-size: 16px;
+        border-bottom: none !important;
+    }
+
+    /* Profile Details Grid */
+    #profileView .col-md-4 {
+        background: #f8fafc;
+        padding: 16px 20px;
+        border-radius: 14px;
+        border: 1px solid #f1f5f9;
+        margin-bottom: 12px;
+    }
+
+    #profileView strong {
+        color: #64748b;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    #profileView p {
+        color: #1e293b !important;
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    /* Form Controls */
+    .form-control,
+    .form-select {
+        border-radius: 12px;
+        padding: 12px 16px;
+        border: 1.5px solid #e2e8f0;
+        font-size: 14.5px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+    }
+
+    /* Action Buttons */
+    .btn-primary {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Tables */
+    .table {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+    .table th {
+        background: #0f172a;
+        color: #ffffff;
+        padding: 16px 20px;
+        font-weight: 600;
+        font-size: 14px;
+        border: none;
+    }
+
+    .table td {
+        padding: 16px 20px;
+        color: #475569;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 14.5px;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+</style>
+
+<div class="container-fluid px-0">
+
+    <!-- TOP HEADER CARD -->
+    <div class="dashboard-header-card d-flex justify-content-between align-items-center">
+        <div>
+            <h3 class="mb-1">Employee Dashboard</h3>
+            <p class="text-muted mb-0">Manage your profile, attendance, leaves, and payroll</p>
+        </div>
+        <div class="d-flex align-items-center">
+            <span id="employeeName" class="text-indigo me-3 fw-bold" style="color: #4f46e5; font-size: 16px;">Welcome,
+                Employee</span>
+            <button class="btn btn-danger fw-bold" onclick="logout()"><i class="bi bi-box-arrow-right me-1"></i>
+                Logout</button>
+        </div>
+    </div>
+
+    <!-- TABS NAVIGATION -->
+    <div class="nav-tabs-custom">
+        <button class="btn active" onclick="showSection('profileSection', event)"><i class="bi bi-person me-2"></i>My
+            Profile</button>
+        <button class="btn" onclick="showSection('attendanceSection', event)"><i
+                class="bi bi-calendar-check me-2"></i>Attendance</button>
+        <button class="btn" onclick="showSection('leaveSection', event)"><i
+                class="bi bi-calendar-x me-2"></i>Leave</button>
+        <button class="btn" onclick="showSection('payrollSection', event)"><i
+                class="bi bi-wallet2 me-2"></i>Payroll</button>
+        <button class="btn" onclick="window.location.href='/dashboard/tasks.html'"><i
+                class="bi bi-check2-square me-2"></i>Tasks</button>
+    </div>
+
+    <!-- SECTION 1: MY PROFILE -->
+    <div id="profileSection" class="dashboard-section">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-person-fill me-2"></i>My Profile Details</span>
+                <button id="editBtn" class="btn btn-sm btn-light text-primary fw-bold px-3 py-2"
+                    style="border-radius: 10px;" onclick="toggleProfileEdit()">✏️ Edit Profile</button>
+            </div>
+            <div class="card-body p-4">
+                <!-- VIEW MODE -->
+                <div id="profileView">
+                    <div class="row g-3">
+                        <div class="col-md-4"><strong>First Name:</strong>
+                            <p id="empFirstName" class="mb-0">-</p>
+                        </div>
+                        <div class="col-md-4"><strong>Last Name:</strong>
+                            <p id="empLastName" class="mb-0">-</p>
+                        </div>
+                        <div class="col-md-4"><strong>Username:</strong>
+                            <p id="empUsername" class="mb-0">-</p>
+                        </div>
+                        <div class="col-md-4"><strong>Email:</strong>
+                            <p id="empEmail" class="mb-0">-</p>
+                        </div>
+                        <div class="col-md-4"><strong>Phone:</strong>
+                            <p id="empPhone" class="mb-0">-</p>
+                        </div>
+                        <div class="col-md-4"><strong>Gender:</strong>
+                            <p id="empGender" class="mb-0">-</p>
+                        </div>
+                        <div class="col-md-4"><strong>Department:</strong>
+                            <p id="empDepartment" class="mb-0">-</p>
+                        </div>
+                        <div class="col-md-4"><strong>Designation:</strong>
+                            <p id="empDesignation" class="mb-0">-</p>
+                        </div>
+                        <div class="col-md-4"><strong>Employment Type:</strong>
+                            <p id="empType" class="mb-0">-</p>
+                        </div>
+                        <div class="col-md-4"><strong>Date of Birth:</strong>
+                            <p id="empDOB" class="mb-0">-</p>
+                        </div>
+                        <div class="col-md-4"><strong>Joining Date:</strong>
+                            <p id="empJoiningDate" class="mb-0">-</p>
+                        </div>
+                        <div class="col-md-4"><strong>Bond Period:</strong>
+                            <p id="empBondPeriod" class="mb-0">-</p>
+                        </div>
+                        <div class="col-md-4"><strong>Address:</strong>
+                            <p id="empAddress" class="mb-0">-</p>
+                        </div>
+                        <div class="col-md-4"><strong>City:</strong>
+                            <p id="empCity" class="mb-0">-</p>
+                        </div>
+                        <div class="col-md-4"><strong>State:</strong>
+                            <p id="empState" class="mb-0">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EDIT FORM MODE -->
+                <form id="profileEditForm" style="display: none;" onsubmit="updateProfile(event)">
+                    <div class="row g-3">
+                        <div class="col-md-4"><label class="form-label fw-bold">First Name</label><input type="text"
+                                id="editFirstName" class="form-control" required></div>
+                        <div class="col-md-4"><label class="form-label fw-bold">Last Name</label><input type="text"
+                                id="editLastName" class="form-control" required></div>
+                        <div class="col-md-4"><label class="form-label fw-bold">Phone</label><input type="text"
+                                id="editPhone" class="form-control"></div>
+                        <div class="col-md-4"><label class="form-label fw-bold">Address</label><input type="text"
+                                id="editAddress" class="form-control"></div>
+                        <div class="col-md-4"><label class="form-label fw-bold">City</label><input type="text"
+                                id="editCity" class="form-control"></div>
+                        <div class="col-md-4"><label class="form-label fw-bold">State</label><input type="text"
+                                id="editState" class="form-control"></div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-success me-2">Save Changes</button>
+                            <button type="button" class="btn btn-secondary px-4" style="border-radius: 12px;"
+                                onclick="toggleProfileEdit()">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 2: ATTENDANCE -->
+    <div id="attendanceSection" class="dashboard-section" style="display: none;">
+        <div class="card mb-4" style="background: #ffffff;">
+            <div class="card-body p-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-bold mb-1">Today's Attendance</h5>
+                    <p class="text-muted mb-0">Mark your daily check-in & check-out</p>
+                </div>
+                <div>
+                    <button id="checkInBtn" class="btn btn-success fw-bold me-2" onclick="handleCheckIn()">Check
+                        In</button>
+                    <button id="checkOutBtn" class="btn btn-danger fw-bold" onclick="handleCheckOut()">Check
+                        Out</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Attendance History</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Date</th>
+                                <th>Check In</th>
+                                <th>Check Out</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceData">
+                            <tr>
+                                <td colspan="5" class="text-center py-4">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 3: LEAVE -->
+    <div id="leaveSection" class="dashboard-section" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">My Leave Requests</h4>
+            <button class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#leaveApplyModal">+ Apply
+                Leave</button>
+        </div>
+        <div class="card">
+            <div class="card-header">My Leave History</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Leave Type</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaveData">
+                            <tr>
+                                <td colspan="6" class="text-center py-4">Loading Leave Data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 4: PAYROLL -->
+    <div id="payrollSection" class="dashboard-section" style="display: none;">
+        <div class="card">
+            <div class="card-header">My Salary Slips / Payroll</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Month / Year</th>
+                                <th>Basic Salary</th>
+                                <th>Allowances</th>
+                                <th>Deductions</th>
+                                <th>Net Salary</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payrollData">
+                            <tr>
+                                <td colspan="7" class="text-center py-4">Loading Payroll Data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- APPLY LEAVE MODAL -->
+<div class="modal fade" id="leaveApplyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
+            <div class="modal-header bg-primary text-white p-4">
+                <h5 class="modal-title fw-bold">Apply For Leave</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form onsubmit="submitLeave(event)">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Leave Type</label>
+                        <select id="leaveType" class="form-select" required>
+                            <option value="Casual Leave">Casual Leave</option>
+                            <option value="Sick Leave">Sick Leave</option>
+                            <option value="Paid Leave">Paid Leave</option>
+                        </select>
+                    </div>
+                    <div class="mb-3"><label class="form-label fw-bold">Start Date</label><input type="date"
+                            id="startDate" class="form-control" required></div>
+                    <div class="mb-3"><label class="form-label fw-bold">End Date</label><input type="date" id="endDate"
+                            class="form-control" required></div>
+                    <div class="mb-3"><label class="form-label fw-bold">Reason</label><textarea id="leaveReason"
+                            class="form-control" rows="3" required placeholder="Enter reason for leave..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer p-4 border-top-0">
+                    <button type="button" class="btn btn-secondary px-4" style="border-radius: 12px;"
+                        data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary px-4">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/employee_dashboard.js' %}"></script>
+{% endblock %}

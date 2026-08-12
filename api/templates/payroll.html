@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payroll{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Payroll Management</h3>
+        <button class="btn btn-primary" onclick="openAddPayrollModal()">Add Payroll</button>
+    </div>
+
+    <!-- Search Input -->
+    <div class="mb-3">
+        <input type="text" id="searchPayroll" class="form-control" placeholder="Search Payroll..."
+            onkeyup="searchPayroll()">
+    </div>
+
+    <!-- Payroll Table -->
+    <table class="table table-bordered table-hover">
+        <thead class="table-primary">
+            <tr>
+                <th>ID</th>
+                <th>Employee</th>
+                <th>Month</th> 
+                <th>Year</th> 
+                <th>Basic Salary</th>
+                <th>Bonus</th>
+                <th>Deduction</th>
+                <th>Net Salary</th>
+                <th>Payment Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="payrollTableBody">
+
+        </tbody>
+    </table>
+</div>
+
+<!-- ===================== PAYROLL MODAL ===================== -->
+<div class="modal fade" id="payrollModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Payroll Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="payroll_id">
+
+                <!-- Employee Field -->
+                <div class="mb-3">
+                    <label class="form-label">Employee</label>
+                    <select id="employee" class="form-control">
+                        <option value="">Select Employee</option>
+                    </select>
+                    <input type="text" id="employee_display" class="form-control" readonly style="display: none;">
+                </div>
+
+                
+                <div class="mb-3">
+                    <label class="form-label">Month</label>
+                    <select id="month" class="form-control">
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
+                </div>
+
+                <!-- Year Input (નવું ઉમેર્યું છે) -->
+                <div class="mb-3">
+                    <label class="form-label">Year</label>
+                    <input type="number" id="year" class="form-control" value="2026">
+                </div>
+
+                <!-- Basic Salary -->
+                <div class="mb-3">
+                    <label class="form-label">Basic Salary</label>
+                    <input type="number" id="basic_salary" class="form-control" placeholder="0.00"
+                        oninput="calculateNetSalary()">
+                </div>
+
+                <!-- Allowance / Bonus -->
+                <div class="mb-3">
+                    <label class="form-label">Bonus / Allowance</label>
+                    <input type="number" id="bonus" class="form-control" placeholder="0.00" value="0"
+                        oninput="calculateNetSalary()">
+                </div>
+
+                <!-- Deductions -->
+                <div class="mb-3">
+                    <label class="form-label">Deductions</label>
+                    <input type="number" id="deductions" class="form-control" placeholder="0.00" value="0"
+                        oninput="calculateNetSalary()">
+                </div>
+
+                <!-- Net Salary -->
+                <div class="mb-3">
+                    <label class="form-label">Net Salary</label>
+                    <input type="number" id="net_salary" class="form-control" placeholder="0.00" readonly>
+                </div>
+
+                <!-- Payment Date -->
+                <div class="mb-3">
+                    <label class="form-label">Payment Date</label>
+                    <input type="date" id="payment_date" class="form-control">
+                </div>
+
+                <!-- Status -->
+                <div class="mb-3">
+                    <label class="form-label">Payment Status</label>
+                    <select id="status" class="form-control">
+                        <option value="Paid">Paid</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" onclick="savePayroll()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/payroll.js' %}"></script>
+{% endblock %}

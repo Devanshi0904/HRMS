@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Department{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2>Department Management</h2>
+
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#departmentModal">
+            <i class="bi bi-plus-circle"></i> Add Department
+        </button>
+
+    </div>
+
+    <!-- Search -->
+
+    <div class="row mb-3">
+
+        <div class="col-md-4">
+
+            <input type="text" id="searchDepartment" class="form-control" placeholder="Search Department..."
+                onkeyup="searchDepartment()">
+
+        </div>
+
+    </div>
+
+    <!-- Table -->
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <table class="table table-bordered table-hover">
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>Department Name</th>
+
+                        <th width="180">Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="departmentTableBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Modal -->
+
+<div class="modal fade" id="departmentModal">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    Department
+
+                </h5>
+
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="department_id">
+
+                <label class="mb-2">Department Name</label>
+
+                <input type="text" id="department_name" class="form-control">
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button class="btn btn-success" onclick="saveDepartment()">
+
+                    Save
+
+                </button>
+
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+
+                    Close
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="{% static 'js/department.js' %}"></script>
+
+{% endblock %}

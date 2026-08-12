@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="row">
+
+        <div class="col-md-3 mb-4">
+
+            <div class="card text-white bg-primary">
+
+                <div class="card-body text-center">
+
+                    <h5>Total Employees</h5>
+
+                    <h2 id="totalEmployees">0</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3 mb-4">
+
+            <div class="card text-white bg-success">
+
+                <div class="card-body text-center">
+
+                    <h5>Total Departments</h5>
+
+                    <h2 id="totalDepartments">0</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3 mb-4">
+
+            <div class="card text-dark bg-warning">
+
+                <div class="card-body text-center">
+
+                    <h5>Today's Attendance</h5>
+
+                    <h2 id="totalAttendance">0</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3 mb-4">
+
+            <div class="card text-white bg-danger">
+
+                <div class="card-body text-center">
+
+                    <h5>Pending Leave</h5>
+
+                    <h2 id="pendingLeave">0</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card mt-3">
+
+        <div class="card-header">
+
+            <h4>Welcome to HRMS</h4>
+
+        </div>
+
+        <div class="card-body">
+
+            <p>
+
+                Human Resource Management System Dashboard.
+
+            </p>
+
+            <p>
+
+                Use the left sidebar to manage Department, Employee,
+                Attendance, Leave and Payroll.
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="{% static 'js/dashboard.js' %}"></script>
+
+{% endblock %}

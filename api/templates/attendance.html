@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Attendance{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between mb-3">
+
+    <h3>Attendance Management</h3>
+
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#attendanceModal" onclick="clearForm()">
+
+        Add Attendance
+
+    </button>
+
+</div>
+
+<input type="text" class="form-control mb-3" id="searchAttendance" placeholder="Search Attendance"
+    onkeyup="searchAttendance()">
+
+<table class="table table-bordered table-hover">
+
+    <thead class="table-dark">
+
+        <tr>
+            <th>Employee</th>
+            <th>Date</th>
+            <th>Check In</th>
+            <th>Check Out</th>
+            <th>Status</th>
+            <th>Action</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody id="attendanceTableBody">
+
+    </tbody>
+
+</table>
+
+
+<div class="modal fade" id="attendanceModal">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5>Attendance</h5>
+
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="attendance_id">
+
+                <div class="mb-2">
+
+                    <label>Employee</label>
+
+                    <select id="employee" class="form-select">
+
+                    </select>
+
+                </div>
+
+                <div class="mb-2">
+
+                    <label>Date</label>
+
+                    <input type="date" id="date" class="form-control">
+
+                </div>
+
+                <div class="mb-2">
+
+                    <label>Check In</label>
+
+                    <input type="time" id="check_in" class="form-control">
+
+                </div>
+
+                <div class="mb-2">
+
+                    <label>Check Out</label>
+
+                    <input type="time" id="check_out" class="form-control">
+
+                </div>
+
+                <div class="mb-2">
+
+                    <label>Status</label>
+
+                    <select id="status" class="form-select">
+
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                        <option value="Half Day">Half Day</option>
+                        <option value="Leave">Leave</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button class="btn btn-success" onclick="saveAttendance()">
+
+                    Save
+
+                </button>
+
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+
+                    Close
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/attendance.js' %}"></script>
+{% endblock %}

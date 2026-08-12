@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Employee{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between mb-3">
+    <h3>Employee Management</h3>
+
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#employeeModal" onclick="clearForm()">
+        Add Employee
+    </button>
+</div>
+
+<input type="text" class="form-control mb-3" id="searchEmployee" placeholder="Search Employee"
+    onkeyup="searchEmployee()">
+
+<table class="table table-bordered table-hover">
+
+    <thead class="table-dark">
+
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Phone</th>
+            <th>Designation</th>
+            <th>Salary</th>
+            <th>Action</th>
+        </tr>
+
+    </thead>
+
+    <tbody id="employeeTableBody">
+
+    </tbody>
+
+</table>
+
+
+<div class="modal fade" id="employeeModal">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5>Employee</h5>
+
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="employee_id">
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-2">
+                        <input class="form-control" id="username" placeholder="Username">
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <input type="password" class="form-control" id="password" placeholder="Password">
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <input class="form-control" id="first_name" placeholder="First Name">
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <input class="form-control" id="last_name" placeholder="Last Name">
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <input class="form-control" id="email" placeholder="Email">
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <select id="department" class="form-select"></select>
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <input class="form-control" id="phone" placeholder="Phone">
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <select id="gender" class="form-select">
+                            <option>Male</option>
+                            <option>Female</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <select id="employment_type" class="form-select">
+                            <option>Intern</option>
+                            <option>Trainee</option>
+                            <option>Full Time</option>
+                            <option>Part Time</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <input type="date" class="form-control" id="date_of_birth">
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <input type="date" class="form-control" id="joining_date">
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <input class="form-control" id="designation" placeholder="Designation">
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <input type="number" class="form-control" id="salary" placeholder="Salary">
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <select id="bond_period" class="form-select">
+                            <option>No Bond</option>
+                            <option>120 Hours</option>
+                            <option>1 Month</option>
+                            <option>3 Months</option>
+                            <option>6 Months</option>
+                            <option>1 Year</option>
+                            <option>2 Years</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-12 mb-2">
+                        <textarea id="address" class="form-control" placeholder="Address"></textarea>
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <input class="form-control" id="city" placeholder="City">
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <input class="form-control" id="state" placeholder="State">
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button class="btn btn-success" onclick="saveEmployee()">
+                    Save
+                </button>
+
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/employee.js' %}"></script>
+{% endblock %}
