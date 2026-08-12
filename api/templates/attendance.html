@@ -1,128 +1,272 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Attendance{% endblock %}
+{% block title %}Attendance Management{% endblock %}
 
 {% block content %}
 
-<div class="d-flex justify-content-between mb-3">
 
-    <h3>Attendance Management</h3>
 
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#attendanceModal" onclick="clearForm()">
+<!-- PAGE HEADER -->
+<div class="attendance-header">
 
+    <div class="attendance-header-left">
+        <div class="attendance-main-icon">
+            <i class="bi bi-calendar-check"></i>
+        </div>
+
+        <div>
+            <div class="attendance-label">HRMS MANAGEMENT</div>
+            <h1>Attendance</h1>
+            <p>Manage employee attendance and working hours</p>
+        </div>
+    </div>
+
+    <button class="attendance-add-btn" data-bs-toggle="modal" data-bs-target="#attendanceModal"
+        onclick="clearAttendanceForm()">
+
+        <i class="bi bi-plus-lg"></i>
         Add Attendance
-
     </button>
 
 </div>
 
-<input type="text" class="form-control mb-3" id="searchAttendance" placeholder="Search Attendance"
-    onkeyup="searchAttendance()">
-
-<table class="table table-bordered table-hover">
-
-    <thead class="table-dark">
-
-        <tr>
-            <th>Employee</th>
-            <th>Date</th>
-            <th>Check In</th>
-            <th>Check Out</th>
-            <th>Status</th>
-            <th>Action</th>
-
-        </tr>
-
-    </thead>
-
-    <tbody id="attendanceTableBody">
-
-    </tbody>
-
-</table>
 
 
-<div class="modal fade" id="attendanceModal">
 
-    <div class="modal-dialog">
 
-        <div class="modal-content">
 
-            <div class="modal-header">
 
-                <h5>Attendance</h5>
+<!-- TABLE CARD -->
+<div class="attendance-table-card">
 
-                <button class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- TABLE HEADER -->
+    <div class="attendance-table-header">
+
+        <div>
+            <h3>Attendance Records</h3>
+            <p>View and manage employee attendance</p>
+        </div>
+
+        <div class="attendance-status">
+            <span></span>
+            Live Records
+        </div>
+
+    </div>
+
+
+    <!-- SEARCH -->
+    <div class="attendance-toolbar">
+
+        <div class="attendance-search">
+            <i class="bi bi-search"></i>
+
+            <input type="text" id="searchAttendance" placeholder="Search employee, date, status..."
+                onkeyup="searchAttendance()">
+        </div>
+
+    </div>
+
+
+    <!-- TABLE -->
+    <div class="attendance-table-wrapper">
+
+        <table class="attendance-table">
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Employee</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="attendanceTableBody">
+                <!-- JavaScript will load records here -->
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<!-- ================= ATTENDANCE MODAL ================= -->
+
+<div class="modal fade" id="attendanceModal" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content attendance-modal">
+
+            <div class="modal-header attendance-modal-header">
+
+                <div class="modal-heading">
+
+                    <div class="modal-icon">
+                        <i class="bi bi-calendar-check-fill"></i>
+                    </div>
+
+                    <div>
+                        <h5>Attendance</h5>
+                        <small>Add or update attendance</small>
+                    </div>
+
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                </button>
 
             </div>
 
-            <div class="modal-body">
+
+            <div class="modal-body attendance-modal-body">
 
                 <input type="hidden" id="attendance_id">
 
-                <div class="mb-2">
 
-                    <label>Employee</label>
+                <!-- EMPLOYEE -->
+                <div class="attendance-form-group">
 
-                    <select id="employee" class="form-select">
+                    <label>
+                        <i class="bi bi-person"></i>
+                        Employee
+                    </label>
 
-                    </select>
+                    <div class="attendance-input">
 
-                </div>
+                        <i class="bi bi-person-fill"></i>
 
-                <div class="mb-2">
+                        <select id="employee" class="form-select">
+                        </select>
 
-                    <label>Date</label>
-
-                    <input type="date" id="date" class="form-control">
-
-                </div>
-
-                <div class="mb-2">
-
-                    <label>Check In</label>
-
-                    <input type="time" id="check_in" class="form-control">
+                    </div>
 
                 </div>
 
-                <div class="mb-2">
 
-                    <label>Check Out</label>
+                <!-- DATE -->
+                <div class="attendance-form-group">
 
-                    <input type="time" id="check_out" class="form-control">
+                    <label>
+                        <i class="bi bi-calendar3"></i>
+                        Date
+                    </label>
+
+                    <div class="attendance-input">
+
+                        <i class="bi bi-calendar-event"></i>
+
+                        <input type="date" id="date" class="form-control">
+
+                    </div>
 
                 </div>
 
-                <div class="mb-2">
 
-                    <label>Status</label>
+                <!-- TIME ROW -->
+                <div class="time-row">
 
-                    <select id="status" class="form-select">
+                    <!-- CHECK IN -->
+                    <div class="attendance-form-group">
 
-                        <option value="Present">Present</option>
-                        <option value="Absent">Absent</option>
-                        <option value="Half Day">Half Day</option>
-                        <option value="Leave">Leave</option>
+                        <label>
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            Check In
+                        </label>
 
-                    </select>
+                        <div class="attendance-input">
+
+                            <i class="bi bi-clock"></i>
+
+                            <input type="time" id="check_in" class="form-control">
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CHECK OUT -->
+                    <div class="attendance-form-group">
+
+                        <label>
+                            <i class="bi bi-box-arrow-right"></i>
+                            Check Out
+                        </label>
+
+                        <div class="attendance-input">
+
+                            <i class="bi bi-clock-history"></i>
+
+                            <input type="time" id="check_out" class="form-control">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STATUS -->
+                <div class="attendance-form-group">
+
+                    <label>
+                        <i class="bi bi-activity"></i>
+                        Status
+                    </label>
+
+                    <div class="attendance-input">
+
+                        <i class="bi bi-check-circle"></i>
+
+                        <select id="status" class="form-select">
+
+                            <option value="Present">
+                                Present
+                            </option>
+
+                            <option value="Absent">
+                                Absent
+                            </option>
+
+                            <option value="Half Day">
+                                Half Day
+                            </option>
+
+                            <option value="Leave">
+                                Leave
+                            </option>
+
+                        </select>
+
+                    </div>
 
                 </div>
 
             </div>
 
-            <div class="modal-footer">
 
-                <button class="btn btn-success" onclick="saveAttendance()">
+            <!-- MODAL FOOTER -->
+            <div class="modal-footer attendance-modal-footer">
 
-                    Save
+                <button type="button" class="attendance-cancel-btn" data-bs-dismiss="modal">
+
+                    Cancel
 
                 </button>
 
-                <button class="btn btn-secondary" data-bs-dismiss="modal">
+                <button type="button" class="attendance-save-btn" onclick="saveAttendance()">
 
-                    Close
+                    <i class="bi bi-check-lg"></i>
+                    Save Attendance
 
                 </button>
 
@@ -136,6 +280,9 @@
 
 {% endblock %}
 
+
 {% block script %}
+
 <script src="{% static 'js/attendance.js' %}"></script>
+
 {% endblock %}

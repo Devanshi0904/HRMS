@@ -1,56 +1,117 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Department{% endblock %}
+{% block title %}Departments{% endblock %}
 
 {% block content %}
 
-<div class="container-fluid">
+<div class="department-page">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- PAGE HEADER -->
+    <div class="department-header">
 
-        <h2>Department Management</h2>
+        <div class="header-left">
 
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#departmentModal">
-            <i class="bi bi-plus-circle"></i> Add Department
+            <div class="header-icon">
+                <i class="bi bi-buildings-fill"></i>
+            </div>
+
+            <div>
+                <span class="page-label">HRMS MANAGEMENT</span>
+
+                <h1>Departments</h1>
+
+                <p>
+                    Manage your organization's departments
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Keep your existing Add button functionality here -->
+        <button type="button" class="add-department-btn" id="addDepartmentBtn" data-bs-toggle="modal"
+            data-bs-target="#departmentModal">
+
+            <i class="bi bi-plus-lg"></i>
+
+            Add Department
+
         </button>
 
     </div>
 
-    <!-- Search -->
 
-    <div class="row mb-3">
+    <!-- SEARCH + SUMMARY -->
+    <div class="department-toolbar">
 
-        <div class="col-md-4">
+        <div class="search-wrapper">
 
-            <input type="text" id="searchDepartment" class="form-control" placeholder="Search Department..."
-                onkeyup="searchDepartment()">
+            <i class="bi bi-search"></i>
+
+            <input type="text" id="searchDepartment" placeholder="Search departments..." autocomplete="off">
 
         </div>
 
     </div>
 
-    <!-- Table -->
 
-    <div class="card">
+    <!-- DEPARTMENT TABLE -->
+    <div class="department-card">
 
-        <div class="card-body">
+        <div class="table-heading">
 
-            <table class="table table-bordered table-hover">
+            <div>
+                <h3>Department List</h3>
+
+                <p>
+                    All departments available in your organization
+                </p>
+            </div>
+
+            <div class="table-status">
+                <span></span>
+                Active
+            </div>
+
+        </div>
+
+
+        <div class="table-responsive">
+
+            <!-- IMPORTANT:
+                 Keep your existing table ID if department.js
+                 already uses a different ID.
+            -->
+
+            <table class="department-table">
 
                 <thead>
 
                     <tr>
 
-                        <th>Department Name</th>
+                        <th width="100">
+                            ID
+                        </th>
 
-                        <th width="180">Action</th>
+                        <th>
+                            Department
+                        </th>
+
+                        <th width="220">
+                            Actions
+                        </th>
 
                     </tr>
 
                 </thead>
 
+
                 <tbody id="departmentTableBody">
+
+                    <!--
+                    Your existing department.js should
+                    populate this section.
+                    -->
 
                 </tbody>
 
@@ -58,62 +119,114 @@
 
         </div>
 
-    </div>
 
-</div>
+        <!-- EMPTY STATE -->
 
+        <div id="emptyDepartment" class="empty-state" style="display:none;">
 
-<!-- Modal -->
-
-<div class="modal fade" id="departmentModal">
-
-    <div class="modal-dialog">
-
-        <div class="modal-content">
-
-            <div class="modal-header">
-
-                <h5 class="modal-title">
-
-                    Department
-
-                </h5>
-
-                <button class="btn-close" data-bs-dismiss="modal"></button>
-
+            <div class="empty-icon">
+                <i class="bi bi-building-x"></i>
             </div>
 
-            <div class="modal-body">
+            <h4>No Departments Found</h4>
 
-                <input type="hidden" id="department_id">
-
-                <label class="mb-2">Department Name</label>
-
-                <input type="text" id="department_name" class="form-control">
-
-            </div>
-
-            <div class="modal-footer">
-
-                <button class="btn btn-success" onclick="saveDepartment()">
-
-                    Save
-
-                </button>
-
-                <button class="btn btn-secondary" data-bs-dismiss="modal">
-
-                    Close
-
-                </button>
-
-            </div>
+            <p>
+                Try another search or create a new department.
+            </p>
 
         </div>
 
     </div>
 
 </div>
+
+
+<!-- =====================================================
+     DEPARTMENT MODAL
+     ===================================================== -->
+
+<div class="modal fade" id="departmentModal" tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content department-modal">
+
+            <div class="modal-header">
+
+                <div class="modal-title-wrapper">
+
+                    <div class="modal-icon">
+                        <i class="bi bi-building-add"></i>
+                    </div>
+
+                    <div>
+                        <h5 class="modal-title">
+                            Add Department
+                        </h5>
+
+                        <small>
+                            Create a new department
+                        </small>
+                    </div>
+
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <input type="hidden" id="department_id">
+
+                <label class="form-label">
+                    Department Name
+                </label>
+
+                <div class="input-box">
+
+                    <i class="bi bi-building"></i>
+
+                    <input type="text" id="department_name" name="department_name" class="form-control"
+                        placeholder="Enter department name" autocomplete="off">
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button" class="cancel-btn" data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+                <button type="button" class="save-btn" id="saveDepartmentBtn" onclick="saveDepartment()">
+
+                    <i class="bi bi-check-lg"></i>
+
+                    Save Department
+
+                </button>
+
+            </div>
+
+
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 
 <script src="{% static 'js/department.js' %}"></script>
 

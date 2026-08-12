@@ -5,107 +5,384 @@
 
 {% block content %}
 
-<div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>Leave Management</h3>
+
+
+<!-- PAGE HEADER -->
+<div class="leave-header">
+
+    <div class="leave-header-left">
+
+        <div class="leave-page-icon">
+            <i class="bi bi-calendar2-check"></i>
+        </div>
+
+        <div>
+            <div class="leave-label">HRMS MANAGEMENT</div>
+
+            <h1>Leave Management</h1>
+
+            <p>
+                Manage employee leave requests and approvals
+            </p>
+        </div>
 
     </div>
 
-    <!-- Search Input -->
-    <div class="mb-3">
-        <input type="text" id="searchLeave" class="form-control" placeholder="Search Leave..." onkeyup="searchLeave()">
-    </div>
+    <button class="leave-add-btn" data-bs-toggle="modal" data-bs-target="#leaveModal" onclick="clearLeaveForm()">
 
-    <!-- Leave Table -->
-    <table class="table table-bordered table-hover">
-        <thead class="table-primary">
-            <tr>
-                <th>ID</th>
-                <th>Employee</th>
-                <th>Leave Type</th>
-                <th>From Date</th>
-                <th>To Date</th>
-                <th>Status</th>
-                <th>Reason</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="leaveTableBody">
-        </tbody>
-    </table>
+        <i class="bi bi-plus-lg"></i>
+        Apply Leave
+
+    </button>
+
 </div>
 
-<!-- ===================== LEAVE MODAL ===================== -->
-<div class="modal fade" id="leaveModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+
+
+
+
+
+
+<!-- SEARCH / FILTER -->
+<div class="leave-toolbar">
+
+    <div class="leave-search">
+
+        <i class="bi bi-search"></i>
+
+        <input type="text" id="searchLeave" placeholder="Search employee, leave type..." onkeyup="searchLeave()">
+
+    </div>
+
+
+    <div class="leave-filter">
+
+        <i class="bi bi-funnel"></i>
+
+        <select id="leaveStatusFilter" onchange="filterLeave()">
+
+            <option value="">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+
+        </select>
+
+    </div>
+
+</div>
+
+
+<!-- LEAVE REQUEST CARD -->
+<div class="leave-card">
+
+    <!-- CARD HEADER -->
+    <div class="leave-card-header">
+
+        <div>
+
+            <h2>
+                Leave Requests
+            </h2>
+
+            <p>
+                Employee leave applications
+            </p>
+
+        </div>
+
+        <div class="active-request">
+
+            <span></span>
+
+            Active Requests
+
+        </div>
+
+    </div>
+
+
+    <!-- TABLE -->
+    <div class="leave-table-wrapper">
+
+        <table class="leave-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Employee</th>
+
+                    <th>Leave Type</th>
+
+                    <th>From</th>
+
+                    <th>To</th>
+
+                    <th>Days</th>
+
+                    <th>Status</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="leaveTableBody">
+
+            </tbody>
+
+        </table>
+
+
+        <!-- EMPTY STATE -->
+
+
+    </div>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     LEAVE MODAL
+===================================================== -->
+
+<div class="modal fade" id="leaveModal" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content leave-modal">
+
+            <!-- MODAL HEADER -->
             <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">Leave</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div class="modal-heading">
+
+                    <div class="modal-heading-icon">
+
+                        <i class="bi bi-calendar-plus"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h5>
+                            Apply Leave
+                        </h5>
+
+                        <small>
+                            Create employee leave request
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                </button>
+
             </div>
+
+
+            <!-- MODAL BODY -->
             <div class="modal-body">
+
                 <input type="hidden" id="leave_id">
 
-                <!-- Employee Field -->
-                <div class="mb-3">
-                    <label class="form-label">Employee</label>
-                    <!-- Add Leave માટે Dropdown -->
-                    <select id="employee" class="form-control">
-                        <option value="">Select Employee</option>
-                    </select>
-                    <!-- Edit Leave માટે Direct Name Text -->
-                    <input type="text" id="employee_display" class="form-control" readonly style="display: none;">
+
+                <!-- EMPLOYEE -->
+                <div class="leave-form-group">
+
+                    <label>
+                        Employee
+                    </label>
+
+                    <div class="leave-input">
+
+                        <i class="bi bi-person"></i>
+
+                        <select id="employee" class="form-control">
+
+                            <option value="">
+                                Select Employee
+                            </option>
+
+                        </select>
+
+                    </div>
+
                 </div>
 
-                <!-- Leave Type -->
-                <div class="mb-3">
-                    <label class="form-label">Leave Type</label>
 
-                    <select id="leave_type" class="form-select">
-                        <option value="Casual Leave">Casual Leave</option>
-                        <option value="Sick Leave">Sick Leave</option>
-                        <option value="Paid Leave">Paid Leave</option>
-                    </select>
+                <!-- LEAVE TYPE -->
+                <div class="leave-form-group">
+
+                    <label>
+                        Leave Type
+                    </label>
+
+                    <div class="leave-input">
+
+                        <i class="bi bi-calendar-event"></i>
+
+                        <select id="leave_type" class="form-control">
+
+                            <option value="">
+                                Select Leave Type
+                            </option>
+
+                            <option value="Casual Leave">
+                                Casual Leave
+                            </option>
+
+                            <option value="Sick Leave">
+                                Sick Leave
+                            </option>
+
+                            <option value="Paid Leave">
+                                Paid Leave
+                            </option>
+
+                            <option value="Emergency Leave">
+                                Emergency Leave
+                            </option>
+
+                        </select>
+
+                    </div>
+
                 </div>
 
-                <!-- From Date -->
-                <div class="mb-3">
-                    <label class="form-label">From Date</label>
-                    <input type="date" id="from_date" class="form-control">
+
+                <!-- DATE ROW -->
+                <div class="leave-date-row">
+
+                    <div class="leave-form-group">
+
+                        <label>
+                            From Date
+                        </label>
+
+                        <div class="leave-input">
+
+                            <i class="bi bi-calendar"></i>
+
+                            <input type="date" id="from_date" class="form-control">
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="leave-form-group">
+
+                        <label>
+                            To Date
+                        </label>
+
+                        <div class="leave-input">
+
+                            <i class="bi bi-calendar-check"></i>
+
+                            <input type="date" id="to_date" class="form-control">
+
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <!-- To Date -->
-                <div class="mb-3">
-                    <label class="form-label">To Date</label>
-                    <input type="date" id="to_date" class="form-control">
+
+                <!-- REASON -->
+                <div class="leave-form-group">
+
+                    <label>
+                        Reason
+                    </label>
+
+                    <div class="leave-input textarea-box">
+
+                        <i class="bi bi-chat-left-text"></i>
+
+                        <textarea id="reason" class="form-control" rows="4"
+                            placeholder="Enter leave reason..."></textarea>
+
+                    </div>
+
                 </div>
 
-                <!-- Reason -->
-                <div class="mb-3">
-                    <label class="form-label">Reason</label>
-                    <textarea id="reason" class="form-control" rows="3"></textarea>
+
+                <!-- STATUS -->
+                <div class="leave-form-group">
+
+                    <label>
+                        Status
+                    </label>
+
+                    <div class="leave-input">
+
+                        <i class="bi bi-check2-circle"></i>
+
+                        <select id="status" class="form-control">
+
+                            <option value="Pending">
+                                Pending
+                            </option>
+
+                            <option value="Approved">
+                                Approved
+                            </option>
+
+                            <option value="Rejected">
+                                Rejected
+                            </option>
+
+                        </select>
+
+                    </div>
+
                 </div>
 
-                <!-- Status -->
-                <div class="mb-3">
-                    <label class="form-label">Status</label>
-                    <select id="status" class="form-select">
-                        <option value="Pending">Pending</option>
-                        <option value="Approved">Approved</option>
-                        <option value="Rejected">Rejected</option>
-                    </select>
-                </div>
             </div>
+
+
+            <!-- MODAL FOOTER -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" onclick="saveLeave()">Save</button>
+
+                <button type="button" class="leave-cancel-btn" data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+
+                <button type="button" class="leave-save-btn" onclick="saveLeave()">
+
+                    <i class="bi bi-check-lg"></i>
+
+                    Save Leave
+
+                </button>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
 
 {% endblock %}
 
+
 {% block script %}
+
 <script src="{% static 'js/leave.js' %}"></script>
+
 {% endblock %}

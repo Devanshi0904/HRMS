@@ -5,250 +5,164 @@
 
 {% block content %}
 
-<div class="employee-page">
 
-    <!-- ================= PAGE HEADER ================= -->
-    <div class="employee-header">
 
-        <div class="employee-title">
+<!-- ================= PAGE HEADER ================= -->
+<div class="employee-header">
 
-            <div class="employee-title-icon">
-                <i class="bi bi-people-fill"></i>
-            </div>
+    <div class="employee-title">
 
-            <div>
-                <span class="employee-label">HRMS MANAGEMENT</span>
-
-                <h1>Employees</h1>
-
-                <p>
-                    Manage your organization's employees
-                </p>
-            </div>
-
+        <div class="employee-title-icon">
+            <i class="bi bi-people-fill"></i>
         </div>
 
-        <button type="button" class="employee-add-btn" id="addEmployeeBtn" data-bs-toggle="modal"
-            data-bs-target="#employeeModal">
-            <i class="bi bi-plus-lg"></i>
-            Add Employee
-        </button>
+        <div>
+            <span class="employee-label">HRMS MANAGEMENT</span>
 
-    </div>
-
-
-    <!-- ================= STAT CARDS ================= -->
-    <div class="employee-stats">
-
-        <!-- TOTAL EMPLOYEES -->
-        <div class="employee-stat-card purple">
-
-            <div class="stat-icon">
-                <i class="bi bi-people-fill"></i>
-            </div>
-
-            <div class="stat-content">
-                <span>Total Employees</span>
-
-                <strong id="employeeCount">0</strong>
-
-                <small>
-                    <i class="bi bi-arrow-up"></i>
-                    Employees in organization
-                </small>
-            </div>
-
-        </div>
-
-
-        <!-- ACTIVE -->
-        <div class="employee-stat-card green">
-
-            <div class="stat-icon">
-                <i class="bi bi-person-check-fill"></i>
-            </div>
-
-            <div class="stat-content">
-                <span>Active Employees</span>
-
-                <strong id="activeEmployeeCount">0</strong>
-
-                <small>
-                    Currently working
-                </small>
-            </div>
-
-        </div>
-
-
-        <!-- DEPARTMENT -->
-        <div class="employee-stat-card blue">
-
-            <div class="stat-icon">
-                <i class="bi bi-building-fill"></i>
-            </div>
-
-            <div class="stat-content">
-                <span>Departments</span>
-
-                <strong id="departmentEmployeeCount">0</strong>
-
-                <small>
-                    Organization departments
-                </small>
-            </div>
-
-        </div>
-
-
-        <!-- NEW EMPLOYEES -->
-        <div class="employee-stat-card orange">
-
-            <div class="stat-icon">
-                <i class="bi bi-person-plus-fill"></i>
-            </div>
-
-            <div class="stat-content">
-                <span>New Employees</span>
-
-                <strong id="newEmployeeCount">0</strong>
-
-                <small>
-                    Recently added
-                </small>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ================= TOOLBAR ================= -->
-    <div class="employee-toolbar">
-
-        <div class="employee-search">
-
-            <i class="bi bi-search"></i>
-
-            <input type="text" id="searchEmployee" placeholder="Search employee..." autocomplete="off">
-
-        </div>
-
-
-        <div class="employee-filter">
-
-            <i class="bi bi-funnel"></i>
-
-            <select id="employeeDepartmentFilter">
-
-                <option value="">
-                    All Departments
-                </option>
-
-            </select>
-
-        </div>
-
-
-        <button type="button" class="refresh-btn" onclick="loadEmployees()" title="Refresh">
-            <i class="bi bi-arrow-clockwise"></i>
-        </button>
-
-    </div>
-
-
-    <!-- ================= EMPLOYEE TABLE CARD ================= -->
-    <div class="employee-table-card">
-
-        <div class="employee-table-header">
-
-            <div>
-
-                <span class="table-label">
-                    EMPLOYEE DIRECTORY
-                </span>
-
-                <h3>
-                    Employee List
-                </h3>
-
-                <p>
-                    View and manage all employees
-                </p>
-
-            </div>
-
-            <div class="employee-status">
-
-                <span></span>
-
-                Active
-
-            </div>
-
-        </div>
-
-
-        <!-- TABLE -->
-        <div class="table-responsive">
-
-            <table class="employee-table">
-
-                <thead>
-
-                    <tr>
-
-                        <th>ID</th>
-
-                        <th>EMPLOYEE</th>
-
-                        <th>EMAIL</th>
-
-                        <th>DEPARTMENT</th>
-
-                        <th>PHONE</th>
-
-                        <th>STATUS</th>
-
-                        <th>ACTION</th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody id="employeeTableBody">
-
-                    <!--
-                    Existing employee.js
-                    will load data here.
-                    -->
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-
-        <!-- EMPTY STATE -->
-        <div id="emptyEmployee" class="employee-empty" style="display:none;">
-
-            <div class="empty-icon">
-                <i class="bi bi-people"></i>
-            </div>
-
-            <h4>
-                No Employees Found
-            </h4>
+            <h1>Employees</h1>
 
             <p>
-                Try another search or add a new employee.
+                Manage your organization's employees
+            </p>
+        </div>
+
+    </div>
+
+    <button type="button" class="employee-add-btn" id="addEmployeeBtn" data-bs-toggle="modal"
+        data-bs-target="#employeeModal">
+        <i class="bi bi-plus-lg"></i>
+        Add Employee
+    </button>
+
+</div>
+
+
+<!-- ================= TOOLBAR ================= -->
+<div class="employee-toolbar">
+
+    <div class="employee-search">
+
+        <i class="bi bi-search"></i>
+
+        <input type="text" id="searchEmployee" placeholder="Search employee..." autocomplete="off">
+
+    </div>
+
+
+    <div class="employee-filter">
+
+        <i class="bi bi-funnel"></i>
+
+        <select id="employeeDepartmentFilter">
+
+            <option value="">
+                All Departments
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <button type="button" class="refresh-btn" onclick="loadEmployees()" title="Refresh">
+        <i class="bi bi-arrow-clockwise"></i>
+    </button>
+
+</div>
+
+
+<!-- ================= EMPLOYEE TABLE CARD ================= -->
+<div class="employee-table-card">
+
+    <div class="employee-table-header">
+
+        <div>
+
+            <span class="table-label">
+                EMPLOYEE DIRECTORY
+            </span>
+
+            <h3>
+                Employee List
+            </h3>
+
+            <p>
+                View and manage all employees
             </p>
 
         </div>
 
+        <div class="employee-status">
+
+            <span></span>
+
+            Active
+
+        </div>
+
     </div>
+
+
+    <!-- TABLE -->
+    <div class="table-responsive">
+
+        <table class="employee-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>EMPLOYEE</th>
+
+                    <th>EMAIL</th>
+
+                    <th>DEPARTMENT</th>
+
+                    <th>PHONE</th>
+
+                    <th>STATUS</th>
+
+                    <th>ACTION</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="employeeTableBody">
+
+                <!--
+                    Existing employee.js
+                    will load data here.
+                    -->
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- EMPTY STATE -->
+    <div id="emptyEmployee" class="employee-empty" style="display:none;">
+
+        <div class="empty-icon">
+            <i class="bi bi-people"></i>
+        </div>
+
+        <h4>
+            No Employees Found
+        </h4>
+
+        <p>
+            Try another search or add a new employee.
+        </p>
+
+    </div>
+
+</div>
 
 </div>
 
