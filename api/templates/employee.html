@@ -1,161 +1,486 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Employee{% endblock %}
+{% block title %}Employee Management{% endblock %}
 
 {% block content %}
 
-<div class="d-flex justify-content-between mb-3">
-    <h3>Employee Management</h3>
+<div class="employee-page">
 
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#employeeModal" onclick="clearForm()">
-        Add Employee
-    </button>
-</div>
+    <!-- ================= PAGE HEADER ================= -->
+    <div class="employee-header">
 
-<input type="text" class="form-control mb-3" id="searchEmployee" placeholder="Search Employee"
-    onkeyup="searchEmployee()">
+        <div class="employee-title">
 
-<table class="table table-bordered table-hover">
+            <div class="employee-title-icon">
+                <i class="bi bi-people-fill"></i>
+            </div>
 
-    <thead class="table-dark">
+            <div>
+                <span class="employee-label">HRMS MANAGEMENT</span>
 
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Department</th>
-            <th>Phone</th>
-            <th>Designation</th>
-            <th>Salary</th>
-            <th>Action</th>
-        </tr>
+                <h1>Employees</h1>
 
-    </thead>
+                <p>
+                    Manage your organization's employees
+                </p>
+            </div>
 
-    <tbody id="employeeTableBody">
+        </div>
 
-    </tbody>
+        <button type="button" class="employee-add-btn" id="addEmployeeBtn" data-bs-toggle="modal"
+            data-bs-target="#employeeModal">
+            <i class="bi bi-plus-lg"></i>
+            Add Employee
+        </button>
 
-</table>
+    </div>
 
 
-<div class="modal fade" id="employeeModal">
+    <!-- ================= STAT CARDS ================= -->
+    <div class="employee-stats">
 
-    <div class="modal-dialog modal-lg">
+        <!-- TOTAL EMPLOYEES -->
+        <div class="employee-stat-card purple">
 
-        <div class="modal-content">
+            <div class="stat-icon">
+                <i class="bi bi-people-fill"></i>
+            </div>
 
-            <div class="modal-header">
+            <div class="stat-content">
+                <span>Total Employees</span>
 
-                <h5>Employee</h5>
+                <strong id="employeeCount">0</strong>
 
-                <button class="btn-close" data-bs-dismiss="modal"></button>
+                <small>
+                    <i class="bi bi-arrow-up"></i>
+                    Employees in organization
+                </small>
+            </div>
+
+        </div>
+
+
+        <!-- ACTIVE -->
+        <div class="employee-stat-card green">
+
+            <div class="stat-icon">
+                <i class="bi bi-person-check-fill"></i>
+            </div>
+
+            <div class="stat-content">
+                <span>Active Employees</span>
+
+                <strong id="activeEmployeeCount">0</strong>
+
+                <small>
+                    Currently working
+                </small>
+            </div>
+
+        </div>
+
+
+        <!-- DEPARTMENT -->
+        <div class="employee-stat-card blue">
+
+            <div class="stat-icon">
+                <i class="bi bi-building-fill"></i>
+            </div>
+
+            <div class="stat-content">
+                <span>Departments</span>
+
+                <strong id="departmentEmployeeCount">0</strong>
+
+                <small>
+                    Organization departments
+                </small>
+            </div>
+
+        </div>
+
+
+        <!-- NEW EMPLOYEES -->
+        <div class="employee-stat-card orange">
+
+            <div class="stat-icon">
+                <i class="bi bi-person-plus-fill"></i>
+            </div>
+
+            <div class="stat-content">
+                <span>New Employees</span>
+
+                <strong id="newEmployeeCount">0</strong>
+
+                <small>
+                    Recently added
+                </small>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= TOOLBAR ================= -->
+    <div class="employee-toolbar">
+
+        <div class="employee-search">
+
+            <i class="bi bi-search"></i>
+
+            <input type="text" id="searchEmployee" placeholder="Search employee..." autocomplete="off">
+
+        </div>
+
+
+        <div class="employee-filter">
+
+            <i class="bi bi-funnel"></i>
+
+            <select id="employeeDepartmentFilter">
+
+                <option value="">
+                    All Departments
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button type="button" class="refresh-btn" onclick="loadEmployees()" title="Refresh">
+            <i class="bi bi-arrow-clockwise"></i>
+        </button>
+
+    </div>
+
+
+    <!-- ================= EMPLOYEE TABLE CARD ================= -->
+    <div class="employee-table-card">
+
+        <div class="employee-table-header">
+
+            <div>
+
+                <span class="table-label">
+                    EMPLOYEE DIRECTORY
+                </span>
+
+                <h3>
+                    Employee List
+                </h3>
+
+                <p>
+                    View and manage all employees
+                </p>
 
             </div>
 
+            <div class="employee-status">
+
+                <span></span>
+
+                Active
+
+            </div>
+
+        </div>
+
+
+        <!-- TABLE -->
+        <div class="table-responsive">
+
+            <table class="employee-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>EMPLOYEE</th>
+
+                        <th>EMAIL</th>
+
+                        <th>DEPARTMENT</th>
+
+                        <th>PHONE</th>
+
+                        <th>STATUS</th>
+
+                        <th>ACTION</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="employeeTableBody">
+
+                    <!--
+                    Existing employee.js
+                    will load data here.
+                    -->
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- EMPTY STATE -->
+        <div id="emptyEmployee" class="employee-empty" style="display:none;">
+
+            <div class="empty-icon">
+                <i class="bi bi-people"></i>
+            </div>
+
+            <h4>
+                No Employees Found
+            </h4>
+
+            <p>
+                Try another search or add a new employee.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     ADD / EDIT EMPLOYEE MODAL
+===================================================== -->
+
+<div class="modal fade" id="employeeModal" tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+
+        <div class="modal-content employee-modal">
+
+            <!-- MODAL HEADER -->
+            <div class="modal-header">
+
+                <div class="modal-title-area">
+
+                    <div class="modal-title-icon">
+
+                        <i class="bi bi-person-plus-fill"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h5 class="modal-title">
+                            Add Employee
+                        </h5>
+
+                        <small>
+                            Create a new employee profile
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+            </div>
+
+
+            <!-- MODAL BODY -->
             <div class="modal-body">
 
-                <input type="hidden" id="employee_id">
+                <div class="employee-form-grid">
 
-                <div class="row">
 
-                    <div class="col-md-6 mb-2">
-                        <input class="form-control" id="username" placeholder="Username">
+                    <!-- FIRST NAME -->
+                    <div class="employee-form-group">
+
+                        <label>
+                            First Name
+                        </label>
+
+                        <div class="employee-input">
+
+                            <i class="bi bi-person"></i>
+
+                            <input type="text" id="employeeFirstName" name="first_name" class="form-control"
+                                placeholder="Enter first name">
+
+                        </div>
+
                     </div>
 
-                    <div class="col-md-6 mb-2">
-                        <input type="password" class="form-control" id="password" placeholder="Password">
+
+                    <!-- LAST NAME -->
+                    <div class="employee-form-group">
+
+                        <label>
+                            Last Name
+                        </label>
+
+                        <div class="employee-input">
+
+                            <i class="bi bi-person"></i>
+
+                            <input type="text" id="employeeLastName" name="last_name" class="form-control"
+                                placeholder="Enter last name">
+
+                        </div>
+
                     </div>
 
-                    <div class="col-md-6 mb-2">
-                        <input class="form-control" id="first_name" placeholder="First Name">
+
+                    <!-- EMAIL -->
+                    <div class="employee-form-group">
+
+                        <label>
+                            Email
+                        </label>
+
+                        <div class="employee-input">
+
+                            <i class="bi bi-envelope"></i>
+
+                            <input type="email" id="employeeEmail" name="email" class="form-control"
+                                placeholder="Enter email">
+
+                        </div>
+
                     </div>
 
-                    <div class="col-md-6 mb-2">
-                        <input class="form-control" id="last_name" placeholder="Last Name">
+
+                    <!-- PHONE -->
+                    <div class="employee-form-group">
+
+                        <label>
+                            Phone
+                        </label>
+
+                        <div class="employee-input">
+
+                            <i class="bi bi-telephone"></i>
+
+                            <input type="text" id="employeePhone" name="phone" class="form-control"
+                                placeholder="Enter phone number">
+
+                        </div>
+
                     </div>
 
-                    <div class="col-md-6 mb-2">
-                        <input class="form-control" id="email" placeholder="Email">
+
+                    <!-- DEPARTMENT -->
+                    <div class="employee-form-group">
+
+                        <label>
+                            Department
+                        </label>
+
+                        <div class="employee-input">
+
+                            <i class="bi bi-building"></i>
+
+                            <select id="employeeDepartment" name="department" class="form-select">
+
+                                <option value="">
+                                    Select Department
+                                </option>
+
+                            </select>
+
+                        </div>
+
                     </div>
 
-                    <div class="col-md-6 mb-2">
-                        <select id="department" class="form-select"></select>
+
+                    <!-- DESIGNATION -->
+                    <div class="employee-form-group">
+
+                        <label>
+                            Designation
+                        </label>
+
+                        <div class="employee-input">
+
+                            <i class="bi bi-briefcase"></i>
+
+                            <input type="text" id="employeeDesignation" name="designation" class="form-control"
+                                placeholder="Enter designation">
+
+                        </div>
+
                     </div>
 
-                    <div class="col-md-6 mb-2">
-                        <input class="form-control" id="phone" placeholder="Phone">
+
+                    <!-- JOINING DATE -->
+                    <div class="employee-form-group">
+
+                        <label>
+                            Joining Date
+                        </label>
+
+                        <div class="employee-input">
+
+                            <i class="bi bi-calendar3"></i>
+
+                            <input type="date" id="employeeJoiningDate" name="joining_date" class="form-control">
+
+                        </div>
+
                     </div>
 
-                    <div class="col-md-6 mb-2">
-                        <select id="gender" class="form-select">
-                            <option>Male</option>
-                            <option>Female</option>
-                        </select>
-                    </div>
 
-                    <div class="col-md-6 mb-2">
-                        <select id="employment_type" class="form-select">
-                            <option>Intern</option>
-                            <option>Trainee</option>
-                            <option>Full Time</option>
-                            <option>Part Time</option>
-                        </select>
-                    </div>
+                    <!-- STATUS -->
+                    <div class="employee-form-group">
 
-                    <div class="col-md-6 mb-2">
-                        <input type="date" class="form-control" id="date_of_birth">
-                    </div>
+                        <label>
+                            Status
+                        </label>
 
-                    <div class="col-md-6 mb-2">
-                        <input type="date" class="form-control" id="joining_date">
-                    </div>
+                        <div class="employee-input">
 
-                    <div class="col-md-6 mb-2">
-                        <input class="form-control" id="designation" placeholder="Designation">
-                    </div>
+                            <i class="bi bi-toggle-on"></i>
 
-                    <div class="col-md-6 mb-2">
-                        <input type="number" class="form-control" id="salary" placeholder="Salary">
-                    </div>
+                            <select id="employeeStatus" name="status" class="form-select">
 
-                    <div class="col-md-6 mb-2">
-                        <select id="bond_period" class="form-select">
-                            <option>No Bond</option>
-                            <option>120 Hours</option>
-                            <option>1 Month</option>
-                            <option>3 Months</option>
-                            <option>6 Months</option>
-                            <option>1 Year</option>
-                            <option>2 Years</option>
-                        </select>
-                    </div>
+                                <option value="Active">
+                                    Active
+                                </option>
 
-                    <div class="col-md-12 mb-2">
-                        <textarea id="address" class="form-control" placeholder="Address"></textarea>
-                    </div>
+                                <option value="Inactive">
+                                    Inactive
+                                </option>
 
-                    <div class="col-md-6 mb-2">
-                        <input class="form-control" id="city" placeholder="City">
-                    </div>
+                            </select>
 
-                    <div class="col-md-6 mb-2">
-                        <input class="form-control" id="state" placeholder="State">
+                        </div>
+
                     </div>
 
                 </div>
 
             </div>
 
+
+            <!-- MODAL FOOTER -->
             <div class="modal-footer">
 
-                <button class="btn btn-success" onclick="saveEmployee()">
-                    Save
+                <button type="button" class="employee-cancel-btn" data-bs-dismiss="modal">
+                    Cancel
                 </button>
 
-                <button class="btn btn-secondary" data-bs-dismiss="modal">
-                    Close
+                <button type="button" class="employee-save-btn" id="saveEmployeeBtn">
+
+                    <i class="bi bi-check-lg"></i>
+
+                    Save Employee
+
                 </button>
 
             </div>
@@ -166,8 +491,8 @@
 
 </div>
 
-{% endblock %}
 
-{% block script %}
+<!-- EMPLOYEE JS -->
 <script src="{% static 'js/employee.js' %}"></script>
+
 {% endblock %}
