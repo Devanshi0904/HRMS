@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.href = "/login_page";
         return;
     }
+    loadTaskData();
     loadProfileData();
     loadAttendanceData();
     loadLeaveData();
@@ -16,16 +17,119 @@ document.addEventListener("DOMContentLoaded", function () {
 // UI Navigation
 function showSection(sectionId, event) {
     document.querySelectorAll(".dashboard-section").forEach(sec => sec.style.display = "none");
-    document.getElementById(sectionId).style.display = "block";
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) targetSection.style.display = "block";
 
     if (event) {
-        document.querySelectorAll(".btn-primary, .btn-outline-primary").forEach(btn => {
-            btn.classList.remove("btn-primary", "active");
-            btn.classList.add("btn-outline-primary");
+        document.querySelectorAll(".nav-tabs-custom .btn").forEach(btn => {
+            btn.classList.remove("active");
         });
-        event.currentTarget.classList.remove("btn-outline-primary");
-        event.currentTarget.classList.add("btn-primary", "active");
+        event.currentTarget.classList.add("active");
     }
+}
+
+// ================= 0. TASK LOGIC =================
+let allEmployeeTasks = [];
+
+function loadTaskData() {
+    fetch(`${BASE_URL}/api/tasks/`, {
+        headers: { "Authorization": "Bearer " + token }
+    })
+        .then(res => res.json())
+        .then(data => {
+            let list = Array.isArray(data) ? data : (data.results || []);
+            allEmployeeTasks = list;
+            let html = "";
+
+            if (list.length === 0) {
+                html = `<tr><td colspan="7" class="text-center py-4">No tasks assigned yet.</td></tr>`;
+            } else {
+                list.forEach(item => {
+                    let statusBadge = item.status === "Completed" ? "bg-success" : (item.status === "In Progress" ? "bg-warning text-dark" : "bg-secondary");
+                    let priorityBadge = item.priority === "High" ? "bg-danger" : (item.priority === "Medium" ? "bg-warning text-dark" : "bg-info text-dark");
+                    let progress = item.progress_percentage || 0;
+
+                    html += `
+                    <tr>
+                        <td>
+                            <strong>${item.title || "-"}</strong>
+                            ${item.description ? `<br><small class="text-muted">${item.description}</small>` : ""}
+                        </td>
+                        <td><span class="badge ${priorityBadge}">${item.priority || "Low"}</span></td>
+                        <td>${item.due_date || "-"}</td>
+                        <td><span class="badge ${statusBadge}">${item.status || "Pending"}</span></td>
+                        <td style="min-width: 120px;">
+                            <div class="progress" style="height: 16px; border-radius: 8px;">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: ${progress}%; font-size: 11px; font-weight: bold;" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100">${progress}%</div>
+                            </div>
+                        </td>
+                        <td>${item.employee_remarks || "-"}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary fw-bold" onclick="openEmployeeTaskModal(${item.id})">
+                                <i class="bi bi-pencil-square me-1"></i>Update
+                            </button>
+                        </td>
+                    </tr>`;
+                });
+            }
+            const taskBody = document.getElementById("taskData");
+            if (taskBody) taskBody.innerHTML = html;
+        })
+        .catch(err => console.error("Task Fetch Error:", err));
+}
+
+function openEmployeeTaskModal(taskId) {
+    const task = allEmployeeTasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    document.getElementById("empTaskId").value = task.id;
+    document.getElementById("empTaskTitle").innerText = task.title || "Task";
+    document.getElementById("empTaskStatus").value = task.status || "Pending";
+    document.getElementById("empTaskProgress").value = task.progress_percentage || 0;
+    document.getElementById("empTaskRemarks").value = task.employee_remarks || "";
+    document.getElementById("empTaskGithub").value = task.github_link || "";
+
+    const modalEl = document.getElementById("employeeTaskModal");
+    if (modalEl) {
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    }
+}
+
+function updateEmployeeTask(event) {
+    event.preventDefault();
+    const taskId = document.getElementById("empTaskId").value;
+
+    const data = {
+        status: document.getElementById("empTaskStatus").value,
+        progress_percentage: parseInt(document.getElementById("empTaskProgress").value) || 0,
+        employee_remarks: document.getElementById("empTaskRemarks").value,
+        github_link: document.getElementById("empTaskGithub").value
+    };
+
+    fetch(`${BASE_URL}/api/tasks/${taskId}/`, {
+        method: "PATCH",
+        headers: {
+            "Authorization": "Bearer " + token,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    })
+        .then(res => {
+            if (!res.ok) throw new Error("Task update failed");
+            return res.json();
+        })
+        .then(() => {
+            alert("Task updated successfully!");
+            const modalEl = document.getElementById("employeeTaskModal");
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+            loadTaskData();
+        })
+        .catch(err => {
+            console.error("Task Update Error:", err);
+            alert("Failed to update task.");
+        });
 }
 
 // ================= 1. PROFILE LOGIC =================

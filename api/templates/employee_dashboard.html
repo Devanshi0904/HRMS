@@ -200,7 +200,7 @@
 
     <!-- TABS NAVIGATION -->
     <div class="nav-tabs-custom">
-        <button class="btn" onclick="window.location.href='/dashboard/tasks.html'"><i
+        <button class="btn active" onclick="showSection('taskSection', event)"><i
                 class="bi bi-check2-square me-2"></i>Tasks</button>
         <button class="btn" onclick="showSection('attendanceSection', event)"><i
                 class="bi bi-calendar-check me-2"></i>Attendance</button>
@@ -208,12 +208,43 @@
                 class="bi bi-calendar-x me-2"></i>Leave</button>
         <button class="btn" onclick="showSection('payrollSection', event)"><i
                 class="bi bi-wallet2 me-2"></i>Payroll</button>
-        <button class="btn active" onclick="showSection('profileSection', event)"><i class="bi bi-person me-2"></i>My
+        <button class="btn" onclick="showSection('profileSection', event)"><i class="bi bi-person me-2"></i>My
             Profile</button>
     </div>
 
+    <!-- SECTION 0: MY TASKS -->
+    <div id="taskSection" class="dashboard-section">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-check2-square me-2"></i>My Assigned Tasks</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Task Title</th>
+                                <th>Priority</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Remarks</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="taskData">
+                            <tr>
+                                <td colspan="7" class="text-center py-4">Loading Tasks...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- SECTION 1: MY PROFILE -->
-    <div id="profileSection" class="dashboard-section">
+    <div id="profileSection" class="dashboard-section" style="display: none;">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span><i class="bi bi-person-fill me-2"></i>My Profile Details</span>
@@ -434,6 +465,54 @@
                     <button type="button" class="btn btn-secondary px-4" style="border-radius: 12px;"
                         data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary px-4">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- UPDATE TASK MODAL FOR EMPLOYEE -->
+<div class="modal fade" id="employeeTaskModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
+            <div class="modal-header bg-primary text-white p-4" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);">
+                <div>
+                    <h5 class="modal-title fw-bold text-white mb-0" id="empTaskTitle">Update Task</h5>
+                    <small class="text-white-50">Update status, progress & remarks for your task</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form onsubmit="updateEmployeeTask(event)">
+                <div class="modal-body p-4">
+                    <input type="hidden" id="empTaskId">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Status</label>
+                        <select id="empTaskStatus" class="form-select" required>
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Progress Percentage (%)</label>
+                        <input type="number" id="empTaskProgress" class="form-control" min="0" max="100" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">GitHub Link (Optional)</label>
+                        <input type="url" id="empTaskGithub" class="form-control" placeholder="https://github.com/...">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">My Remarks</label>
+                        <textarea id="empTaskRemarks" class="form-control" rows="3" placeholder="Enter remarks or updates..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer p-4 border-top-0">
+                    <button type="button" class="btn btn-secondary px-4" style="border-radius: 12px;" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary px-4">Update Task</button>
                 </div>
             </form>
         </div>
