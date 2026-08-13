@@ -146,6 +146,8 @@ class Leave(models.Model):
 class Payroll(models.Model):
 
     SALARY_STATUS = (
+        ('Pending', 'Pending'),
+        ('Processing', 'Processing'),
         ('Paid', 'Paid'),
         ('Unpaid', 'Unpaid'),
     )

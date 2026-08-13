@@ -24,6 +24,7 @@ function calculateNetSalary() {
 }
 
 // ===================== LOAD PAYROLLS =====================
+// ===================== LOAD PAYROLLS =====================
 function loadPayrolls() {
     fetch(`${BASE_URL}/payroll/`, {
         method: "GET",
@@ -35,24 +36,33 @@ function loadPayrolls() {
             let tableRows = "";
 
             if (payrollList.length === 0) {
-                tableRows = `<tr><td colspan="11" class="text-center">No Payroll Records Found</td></tr>`;
+                tableRows = `<tr><td colspan="10" class="text-center">No Payroll Records Found</td></tr>`;
             } else {
                 payrollList.forEach(item => {
                     let empName = item.employee_name || item.employee || '-';
 
-                    let statusBadge = item.status === 'Paid' ? 'bg-success' : 'bg-warning text-dark';
+                    // 1. Model ma field 'salary_status' che, aethi ahiya te use karvanu
+                    let currentStatus = item.salary_status || 'Unpaid';
+
+                    // 2. Status badge color configuration
+                    let statusBadge = 'bg-warning text-dark';
+                    if (currentStatus === 'Paid') {
+                        statusBadge = 'bg-success';
+                    } else if (currentStatus === 'Processing') {
+                        statusBadge = 'bg-info text-dark';
+                    }
 
                     let monthVal = item.month || '-';
                     let yearVal = item.year || '-';
-                    let basicSalary = item.basic_salary || item.salary || 0;
-                    let bonusVal = item.bonus || item.allowance || 0;
-                    let deductionVal = item.deductions || 0;
+                    let basicSalary = item.basic_salary || 0;
+                    let bonusVal = item.bonus || 0;
+                    let deductionVal = item.deduction || 0; // Model ma 'deduction' che (deductions nahi)
                     let netSalary = item.net_salary || (parseFloat(basicSalary) + parseFloat(bonusVal) - parseFloat(deductionVal));
-                    let payDate = item.payment_date || item.date || '-';
+                    let payDate = item.payment_date || '-';
 
                     tableRows += `
                     <tr>
-                        <td>${empName}</td>
+                        <td><strong>${empName}</strong></td>
                         <td>${monthVal}</td>
                         <td>${yearVal}</td>
                         <td>₹${basicSalary}</td>
@@ -60,7 +70,7 @@ function loadPayrolls() {
                         <td>₹${deductionVal}</td>
                         <td><strong>₹${netSalary}</strong></td>
                         <td>${payDate}</td>
-                        <td><span class="badge ${statusBadge}">${item.status || 'Pending'}</span></td>
+                        <td><span class="badge ${statusBadge}">${currentStatus}</span></td>
                         <td>
                             <button class="btn btn-sm btn-warning" onclick="editPayroll(${item.id})">Edit</button>
                             <button class="btn btn-sm btn-danger" onclick="deletePayroll(${item.id})">Delete</button>
@@ -143,8 +153,8 @@ function addPayroll() {
         bonus: document.getElementById("bonus").value || 0,
         deductions: document.getElementById("deductions").value || 0,
         net_salary: document.getElementById("net_salary").value,
-        month: document.getElementById("month").value || "August", 
-        year: document.getElementById("year").value || 2026,        
+        month: document.getElementById("month").value || "August",
+        year: document.getElementById("year").value || 2026,
         payment_date: document.getElementById("payment_date").value,
         status: document.getElementById("status").value
     };
@@ -202,7 +212,7 @@ function editPayroll(id) {
             if (document.getElementById("year")) document.getElementById("year").value = item.year || 2026;
 
             document.getElementById("payment_date").value = item.payment_date || item.date || "";
-            document.getElementById("status").value = item.status || "Paid";
+            document.getElementById("status").value = item.status || "Unpaid";
 
             calculateNetSalary();
 
@@ -221,9 +231,9 @@ function updatePayroll(id) {
         deductions: document.getElementById("deductions").value || 0,
         net_salary: document.getElementById("net_salary").value,
         month: document.getElementById("month").value,
-        year: document.getElementById("year").value,   
+        year: document.getElementById("year").value,
         payment_date: document.getElementById("payment_date").value,
-        status: document.getElementById("status").value
+        salary_status: document.getElementById("status").value
     };
 
     fetch(`${BASE_URL}/payroll/${id}/`, {
@@ -235,11 +245,12 @@ function updatePayroll(id) {
             let data = await res.json();
             if (res.ok) {
                 alert("Payroll Record Updated Successfully");
-                location.reload();
+                location.reload(); // Aa line page ne refresh karse etle table ma latest status 100% dekhaai jase!
             } else {
                 alert("Error: " + JSON.stringify(data));
             }
-        });
+        })
+        .catch(err => console.error("Update payroll error:", err));
 }
 
 // ===================== DELETE PAYROLL =====================

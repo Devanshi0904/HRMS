@@ -9,573 +9,211 @@
 
     <!-- ================= PAGE HEADER ================= -->
     <div class="payroll-header">
-
         <div class="payroll-title">
-
             <div class="payroll-title-icon">
                 <i class="bi bi-wallet2"></i>
             </div>
-
             <div>
                 <span class="payroll-label">HRMS MANAGEMENT</span>
-
                 <h1>Payroll Management</h1>
-
-                <p>
-                    Manage employee salaries, payroll and payment status
-                </p>
+                <p>Manage employee salaries, payroll and payment status</p>
             </div>
-
         </div>
 
         <button type="button" class="payroll-add-btn" data-bs-toggle="modal" data-bs-target="#payrollModal"
-            onclick="clearPayrollForm()">
-
+            onclick="openAddPayrollModal()">
             <i class="bi bi-plus-lg"></i>
             Generate Payroll
-
         </button>
-
     </div>
-
-
-    <!-- ================= STATISTICS ================= -->
-
-    <div class="payroll-stats">
-
-        <!-- TOTAL PAYROLL -->
-        <div class="payroll-stat-card purple" style="background: linear-gradient(135deg, #850ebd 0%, #58097d 50%)">
-
-            <div class="payroll-stat-icon">
-                <i class="bi bi-cash-stack"></i>
-            </div>
-
-            <div class="payroll-stat-content">
-
-                <span>Total Payroll</span>
-
-                <strong id="totalPayroll">
-                    ₹0
-                </strong>
-
-                <small>
-                    Current month payroll
-                </small>
-
-            </div>
-
-        </div>
-
-
-        <!-- PAID -->
-        <div class="payroll-stat-card green" style="background: linear-gradient(135deg, #10b981 0%, #047857 50%)">
-
-            <div class="payroll-stat-icon">
-                <i class="bi bi-check-circle-fill"></i>
-            </div>
-
-            <div class="payroll-stat-content">
-
-                <span>Paid Salary</span>
-
-                <strong id="paidPayroll">
-                    ₹0
-                </strong>
-
-                <small>
-                    Successfully paid
-                </small>
-
-            </div>
-
-        </div>
-
-
-        <!-- PENDING -->
-        <div class="payroll-stat-card orange" style=" background: linear-gradient(135deg, #f59e0b 0%, #b45309 50%)">
-
-            <div class="payroll-stat-icon">
-                <i class="bi bi-hourglass-split"></i>
-            </div>
-
-            <div class="payroll-stat-content">
-
-                <span>Pending Salary</span>
-
-                <strong id="pendingPayroll">
-                    ₹0
-                </strong>
-
-                <small>
-                    Awaiting payment
-                </small>
-
-            </div>
-
-        </div>
-
-
-        <!-- EMPLOYEES -->
-        <div class="payroll-stat-card blue" style="   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 10%)">
-
-            <div class="payroll-stat-icon">
-                <i class="bi bi-people-fill"></i>
-            </div>
-
-            <div class="payroll-stat-content">
-
-                <span>Employees</span>
-
-                <strong id="payrollEmployeeCount">
-                    0
-                </strong>
-
-                <small>
-                    Payroll employees
-                </small>
-
-            </div>
-
-        </div>
-
-    </div>
-
 
     <!-- ================= TOOLBAR ================= -->
-
     <div class="payroll-toolbar">
-
-        <!-- SEARCH -->
-
         <div class="payroll-search">
-
             <i class="bi bi-search"></i>
-
             <input type="text" id="searchPayroll" placeholder="Search employee..." autocomplete="off"
                 onkeyup="searchPayroll()">
-
         </div>
-
-
-        <!-- MONTH -->
-
-        <div class="payroll-filter">
-
-            <i class="bi bi-calendar3"></i>
-
-            <input type="month" id="payrollMonth" onchange="filterPayroll()">
-
-        </div>
-
-
-        <!-- STATUS -->
-
-        <div class="payroll-filter">
-
-            <i class="bi bi-funnel"></i>
-
-            <select id="payrollStatusFilter" onchange="filterPayroll()">
-
-                <option value="">
-                    All Status
-                </option>
-
-                <option value="Paid">
-                    Paid
-                </option>
-
-                <option value="Pending">
-                    Pending
-                </option>
-
-                <option value="Processing">
-                    Processing
-                </option>
-
-            </select>
-
-        </div>
-
-
-        <!-- REFRESH -->
-
-        <button type="button" class="payroll-refresh-btn" onclick="loadPayroll()" title="Refresh">
-
-            <i class="bi bi-arrow-clockwise"></i>
-
-        </button>
-
     </div>
 
-
     <!-- ================= PAYROLL TABLE ================= -->
-
     <div class="payroll-table-card">
-
         <div class="payroll-table-header">
-
             <div>
-
-                <span class="payroll-table-label">
-                    SALARY DIRECTORY
-                </span>
-
-                <h3>
-                    Payroll Records
-                </h3>
-
-                <p>
-                    View and manage employee salary records
-                </p>
-
+                <span class="payroll-table-label">SALARY DIRECTORY</span>
+                <h3>Payroll Records</h3>
+                <p>View and manage employee salary records</p>
             </div>
-
-
             <div class="payroll-status-indicator">
-
                 <span></span>
-
                 Payroll Active
-
             </div>
-
         </div>
-
 
         <!-- TABLE -->
-
         <div class="table-responsive">
-
             <table class="payroll-table">
-
                 <thead>
-
                     <tr>
-
-                        <th>ID</th>
-
-                        <th>EMPLOYEE</th>
-
-                        <th>MONTH</th>
-
-                        <th>BASIC SALARY</th>
-
-                        <th>ALLOWANCE</th>
-
-                        <th>DEDUCTION</th>
-
-                        <th>NET SALARY</th>
-
-                        <th>STATUS</th>
-
-                        <th>ACTION</th>
-
+                        <th>Employee</th>
+                        <th>Month</th>
+                        <th>Year</th>
+                        <th>Basic Salary</th>
+                        <th>Bonus</th>
+                        <th>Deductions</th>
+                        <th>Net Salary</th>
+                        <th>Payment Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
                     </tr>
-
                 </thead>
-
-
                 <tbody id="payrollTableBody">
-
-                    <!-- payroll.js will load records -->
-
+                    <!-- payroll.js will load records dynamically -->
                 </tbody>
-
             </table>
-
         </div>
-
-
-        <!-- EMPTY -->
-
-        <div id="emptyPayroll" class="payroll-empty" style="display:none;">
-
-            <div class="payroll-empty-icon">
-
-                <i class="bi bi-wallet2"></i>
-
-            </div>
-
-            <h4>
-                No Payroll Records Found
-            </h4>
-
-            <p>
-                Try another search or generate a new payroll.
-            </p>
-
-        </div>
-
     </div>
 
 </div>
 
-
-
 <!-- =====================================================
-     PAYROLL MODAL
+     PAYROLL MODAL (ADD / EDIT)
 ===================================================== -->
-
 <div class="modal fade" id="payrollModal" tabindex="-1" aria-hidden="true">
-
     <div class="modal-dialog modal-dialog-centered modal-lg">
-
         <div class="modal-content payroll-modal">
 
-
             <!-- HEADER -->
-
             <div class="modal-header">
-
                 <div class="payroll-modal-title">
-
                     <div class="payroll-modal-icon">
-
                         <i class="bi bi-wallet-fill"></i>
-
                     </div>
-
                     <div>
-
-                        <h5 class="modal-title">
-                            Generate Payroll
-                        </h5>
-
-                        <small>
-                            Create employee salary record
-                        </small>
-
+                        <h5 class="modal-title">Generate Payroll</h5>
+                        <small>Create or update employee salary record</small>
                     </div>
-
                 </div>
-
-
-                <button type="button" class="btn-close" data-bs-dismiss="modal">
-                </button>
-
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-
             <!-- BODY -->
-
             <div class="modal-body">
-
                 <input type="hidden" id="payroll_id">
-
 
                 <div class="payroll-form-grid">
 
-
                     <!-- EMPLOYEE -->
-
                     <div class="payroll-form-group">
-
-                        <label>
-                            Employee
-                        </label>
-
+                        <label>Employee</label>
                         <div class="payroll-input">
-
                             <i class="bi bi-person"></i>
-
-                            <select id="payrollEmployee" class="form-select">
-
-                                <option value="">
-                                    Select Employee
-                                </option>
-
+                            <!-- Dropdown for Adding -->
+                            <select id="employee" class="form-select">
+                                <option value="">Select Employee</option>
                             </select>
-
+                            <!-- Text input for Displaying Name during Edit -->
+                            <input type="text" id="employee_display" class="form-control" style="display:none;"
+                                readonly>
                         </div>
-
                     </div>
-
 
                     <!-- MONTH -->
-
                     <div class="payroll-form-group">
-
-                        <label>
-                            Payroll Month
-                        </label>
-
+                        <label>Month</label>
                         <div class="payroll-input">
-
                             <i class="bi bi-calendar3"></i>
-
-                            <input type="month" id="payrollMonthInput" class="form-control">
-
+                            <input type="text" id="month" class="form-control" placeholder="e.g. August">
                         </div>
-
                     </div>
 
-
-                    <!-- BASIC -->
-
+                    <!-- YEAR -->
                     <div class="payroll-form-group">
-
-                        <label>
-                            Basic Salary
-                        </label>
-
+                        <label>Year</label>
                         <div class="payroll-input">
+                            <i class="bi bi-calendar-event"></i>
+                            <input type="number" id="year" class="form-control" placeholder="e.g. 2026">
+                        </div>
+                    </div>
 
+                    <!-- BASIC SALARY -->
+                    <div class="payroll-form-group">
+                        <label>Basic Salary</label>
+                        <div class="payroll-input">
                             <i class="bi bi-currency-rupee"></i>
-
-                            <input type="number" id="basicSalary" class="form-control" placeholder="Enter basic salary">
-
+                            <input type="number" id="basic_salary" class="form-control" placeholder="Enter basic salary"
+                                oninput="calculateNetSalary()">
                         </div>
-
                     </div>
 
-
-                    <!-- ALLOWANCE -->
-
+                    <!-- BONUS -->
                     <div class="payroll-form-group">
-
-                        <label>
-                            Allowance
-                        </label>
-
+                        <label>Bonus</label>
                         <div class="payroll-input">
-
                             <i class="bi bi-plus-circle"></i>
-
-                            <input type="number" id="allowance" class="form-control" placeholder="Enter allowance">
-
+                            <input type="number" id="bonus" class="form-control" placeholder="Enter bonus"
+                                oninput="calculateNetSalary()">
                         </div>
-
                     </div>
 
-
-                    <!-- DEDUCTION -->
-
+                    <!-- DEDUCTIONS -->
                     <div class="payroll-form-group">
-
-                        <label>
-                            Deduction
-                        </label>
-
+                        <label>Deductions</label>
                         <div class="payroll-input">
-
                             <i class="bi bi-dash-circle"></i>
-
-                            <input type="number" id="deduction" class="form-control" placeholder="Enter deduction">
-
+                            <input type="number" id="deductions" class="form-control" placeholder="Enter deductions"
+                                oninput="calculateNetSalary()">
                         </div>
-
                     </div>
-
 
                     <!-- NET SALARY -->
-
                     <div class="payroll-form-group">
-
-                        <label>
-                            Net Salary
-                        </label>
-
+                        <label>Net Salary</label>
                         <div class="payroll-input">
-
                             <i class="bi bi-cash-stack"></i>
-
-                            <input type="number" id="netSalary" class="form-control" placeholder="Net salary" readonly>
-
+                            <input type="number" id="net_salary" class="form-control" placeholder="Net salary" readonly>
                         </div>
-
                     </div>
-
-
-                    <!-- STATUS -->
-
-                    <div class="payroll-form-group">
-
-                        <label>
-                            Payment Status
-                        </label>
-
-                        <div class="payroll-input">
-
-                            <i class="bi bi-check2-circle"></i>
-
-                            <select id="payrollStatus" class="form-select">
-
-                                <option value="Pending">
-                                    Pending
-                                </option>
-
-                                <option value="Processing">
-                                    Processing
-                                </option>
-
-                                <option value="Paid">
-                                    Paid
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
 
                     <!-- PAYMENT DATE -->
-
                     <div class="payroll-form-group">
-
-                        <label>
-                            Payment Date
-                        </label>
-
+                        <label>Payment Date</label>
                         <div class="payroll-input">
-
                             <i class="bi bi-calendar-check"></i>
-
-                            <input type="date" id="paymentDate" class="form-control">
-
+                            <input type="date" id="payment_date" class="form-control">
                         </div>
-
                     </div>
 
+                    <!-- STATUS -->
+                    <div class="payroll-form-group">
+                        <label>Payment Status</label>
+                        <div class="payroll-input">
+                            <i class="bi bi-check2-circle"></i>
+                            <select id="status" class="form-select">
+                                <option value="Pending">Pending</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Paid">Paid</option>
+                            </select>
+                        </div>
+                    </div>
 
                 </div>
-
             </div>
 
-
             <!-- FOOTER -->
-
             <div class="modal-footer">
-
-                <button type="button" class="payroll-cancel-btn" data-bs-dismiss="modal">
-
-                    Cancel
-
+                <button type="button" class="payroll-cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="payroll-payroll-save-btn payroll-save-btn" onclick="savePayroll()">
+                    <i class="bi bi-check-lg"></i> Save Payroll
                 </button>
-
-
-                <button type="button" class="payroll-save-btn" onclick="savePayroll()">
-
-                    <i class="bi bi-check-lg"></i>
-
-                    Save Payroll
-
-                </button>
-
             </div>
 
         </div>
-
     </div>
-
 </div>
-
 
 {% endblock %}
 
-
 {% block script %}
-
 <script src="{% static 'js/payroll.js' %}"></script>
-
 {% endblock %}
