@@ -1,18 +1,42 @@
 // =========================================================
-// ATTENDANCE JS
+// ATTENDANCE CALENDAR JS
 // =========================================================
 
 const ATTENDANCE_BASE_URL = "http://127.0.0.1:8000/api";
 
 
+// =========================================================
+// GLOBAL VARIABLES
+// =========================================================
+
+let allEmployees = [];
+let allAttendance = [];
+
+let selectedEmployeeId = "";
+let selectedEmployeeName = "";
+
+let selectedStatus = "";
+
+let currentCalendarDate = new Date();
+
+
+// =========================================================
+// HEADERS
+// =========================================================
+
 function attendanceHeaders() {
 
     const token = localStorage.getItem("access");
 
-    return {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
+    const headers = {
+        "Content-Type": "application/json"
     };
+
+    if (token) {
+        headers["Authorization"] = "Bearer " + token;
+    }
+
+    return headers;
 }
 
 
@@ -22,122 +46,115 @@ function attendanceHeaders() {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    setCurrentMonth();
-    setYears();
+    initializeYearDropdown();
 
-    loadEmployees();
-    loadAttendance();
+    initializeDate();
+
+    initializeEmployeeSearch();
+
+    initializeStatusButton();
+
+    initializeSearchButton();
+
+    initializeMonthButtons();
+
+    initializeViewButtons();
+
+    renderCalendar();
 
 });
-
-
-// =========================================================
-// CURRENT MONTH
-// =========================================================
-
-function setCurrentMonth() {
-
-    const input = document.getElementById("attendanceMonth");
-
-    if (!input) return;
-
-    const today = new Date();
-
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-
-    input.value = `${today.getFullYear()}-${month}`;
-}
 
 
 // =========================================================
 // YEAR DROPDOWN
 // =========================================================
 
-function setYears() {
+function initializeYearDropdown() {
 
-    const select = document.getElementById("attendanceYear");
+    const yearSelect =
+        document.getElementById("attendanceYearFilter");
 
-    if (!select) return;
+    if (!yearSelect) {
+        return;
+    }
 
-    const currentYear = new Date().getFullYear();
+    const currentYear =
+        new Date().getFullYear();
 
-    select.innerHTML = `<option value="">Select Year</option>`;
+    yearSelect.innerHTML =
+        `<option value="">Select Year</option>`;
 
-    for (let year = currentYear; year >= currentYear - 5; year--) {
+    for (
+        let year = currentYear;
+        year >= currentYear - 10;
+        year--
+    ) {
 
-        select.innerHTML += `
+        yearSelect.innerHTML += `
             <option value="${year}">
                 ${year}
             </option>
         `;
 
     }
+
+    yearSelect.value = currentYear;
+
 }
 
 
 // =========================================================
-// LOAD EMPLOYEES
+// DATE
 // =========================================================
 
-// =========================================================
-// LOAD EMPLOYEES FOR SEARCH
-// =========================================================
+function initializeDate() {
 
-let attendanceEmployees = [];
-
-function loadEmployees() {
-
-    fetch(`${ATTENDANCE_BASE_URL}/employee/`, {
-        method: "GET",
-        headers: attendanceHeaders()
-    })
-
-        .then(response => {
-
-            if (!response.ok) {
-                throw new Error(
-                    "Employee API Error: " + response.status
-                );
-            }
-
-            return response.json();
-
-        })
-
-        .then(data => {
-
-            attendanceEmployees =
-                Array.isArray(data)
-                    ? data
-                    : (data.results || []);
-
-            setupEmployeeSearch();
-
-        })
-
-        .catch(error => {
-
-            console.error(
-                "Employee loading error:",
-                error
-            );
-
-        });
-}
-// =========================================================
-// EMPLOYEE SEARCH + SUGGESTIONS
-// =========================================================
-
-function setupEmployeeSearch() {
-
-    const searchInput =
+    const dateInput =
         document.getElementById(
-            "attendanceEmployeeSearch"
+            "attendanceDateFilter"
         );
 
-    const hiddenInput =
+    if (!dateInput) {
+        return;
+    }
+
+    const today = new Date();
+
+    const year =
+        today.getFullYear();
+
+    const month =
+        String(
+            today.getMonth() + 1
+        ).padStart(2, "0");
+
+    const day =
+        String(
+            today.getDate()
+        ).padStart(2, "0");
+
+    dateInput.value =
+        `${year}-${month}-${day}`;
+
+    currentCalendarDate =
+        new Date(
+            year,
+            today.getMonth(),
+            1
+        );
+
+}
+
+
+// =========================================================
+// EMPLOYEE SEARCH
+// =========================================================
+
+function initializeEmployeeSearch() {
+
+    const input =
         document.getElementById(
-            "attendanceEmployee"
+            "attendanceEmployeeSearch"
         );
 
     const suggestions =
@@ -145,128 +162,76 @@ function setupEmployeeSearch() {
             "employeeSuggestions"
         );
 
-
-    if (!searchInput || !hiddenInput || !suggestions) {
+    if (!input || !suggestions) {
         return;
     }
 
 
-    searchInput.addEventListener("input", function () {
-
-        const search =
-            this.value
-                .trim()
-                .toLowerCase();
+    // Load employee data
+    loadEmployees();
 
 
-        hiddenInput.value = "";
+    // Search typing
+    input.addEventListener(
+        "input",
+        function () {
+
+            const search =
+                input.value
+                    .trim()
+                    .toLowerCase();
 
 
-        if (!search) {
+            selectedEmployeeId = "";
 
-            suggestions.innerHTML = "";
-            suggestions.style.display = "none";
-
-            loadAttendance();
-
-            return;
-        }
+            document.getElementById(
+                "attendanceEmployeeId"
+            ).value = "";
 
 
-        const filteredEmployees =
-            attendanceEmployees.filter(emp => {
+            if (!search) {
 
-                const name =
-                    getEmployeeName(emp)
-                        .toLowerCase();
+                suggestions.innerHTML = "";
 
-                return name.includes(search);
+                suggestions.style.display =
+                    "none";
 
-            });
+                return;
 
-
-        suggestions.innerHTML = "";
+            }
 
 
-        if (filteredEmployees.length === 0) {
+            const filtered =
+                allEmployees.filter(
+                    employee => {
 
-            suggestions.innerHTML = `
-                <div class="employee-no-result">
-                    <i class="bi bi-person-x"></i>
-                    No employee found
-                </div>
-            `;
+                        const name =
+                            getEmployeeName(
+                                employee
+                            ).toLowerCase();
 
-            suggestions.style.display = "block";
+                        return name.includes(search);
 
-            return;
-        }
-
-
-        filteredEmployees.forEach(emp => {
-
-            const name =
-                getEmployeeName(emp);
+                    }
+                );
 
 
-            const item =
-                document.createElement("div");
-
-            item.className =
-                "employee-suggestion";
-
-
-            item.innerHTML = `
-                <div class="employee-suggestion-icon">
-                    <i class="bi bi-person-fill"></i>
-                </div>
-
-                <div class="employee-suggestion-info">
-                    <strong>${name}</strong>
-                    <small>Employee ID: #${emp.id}</small>
-                </div>
-            `;
-
-
-            item.addEventListener(
-                "click",
-                function () {
-
-                    searchInput.value = name;
-
-                    hiddenInput.value =
-                        emp.id;
-
-                    suggestions.innerHTML = "";
-
-                    suggestions.style.display =
-                        "none";
-
-                    loadAttendance();
-
-                }
+            showEmployeeSuggestions(
+                filtered
             );
 
-
-            suggestions.appendChild(item);
-
-        });
+        }
+    );
 
 
-        suggestions.style.display =
-            "block";
-
-    });
-
-
-    // Click outside -> suggestions hide
+    // Click outside
     document.addEventListener(
         "click",
         function (event) {
 
             if (
                 !event.target.closest(
-                    ".employee-search-filter"
+                    ".employee-search-wrapper"
                 )
             ) {
 
@@ -277,1062 +242,1685 @@ function setupEmployeeSearch() {
 
         }
     );
+
 }
+
+
+// =========================================================
+// LOAD EMPLOYEES
+// =========================================================
+
+async function loadEmployees() {
+
+    try {
+
+        const response =
+            await fetch(
+                `${ATTENDANCE_BASE_URL}/employee/`,
+                {
+                    method: "GET",
+                    headers: attendanceHeaders()
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Employee API Error: " +
+                response.status
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        allEmployees =
+            Array.isArray(data)
+                ? data
+                : (
+                    data.results || []
+                );
+
+
+        console.log(
+            "Employees:",
+            allEmployees
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Employee loading error:",
+            error
+        );
+
+    }
+
+}
+
+
 // =========================================================
 // GET EMPLOYEE NAME
 // =========================================================
 
-function getEmployeeName(emp) {
+function getEmployeeName(employee) {
 
-    const firstName = emp.first_name || "";
-    const lastName = emp.last_name || "";
+    return (
 
-    const fullName =
-        `${firstName} ${lastName}`.trim();
+        employee.name ||
 
-    if (fullName) {
-        return fullName;
+        employee.full_name ||
+
+        employee.employee_name ||
+
+        (
+            `${employee.first_name || ""} ${employee.last_name || ""
+            }`
+        ).trim() ||
+
+        (
+            employee.user_name ||
+            employee.username ||
+            ""
+        )
+
+    );
+
+}
+
+
+// =========================================================
+// SHOW EMPLOYEE SUGGESTIONS
+// =========================================================
+
+function showEmployeeSuggestions(
+    employees
+) {
+
+    const suggestions =
+        document.getElementById(
+            "employeeSuggestions"
+        );
+
+    if (!suggestions) {
+        return;
     }
 
-    if (emp.username) {
-        return emp.username;
-    }
 
-    return "Employee #" + emp.id;
-}
-// =========================================================
-// LOAD ATTENDANCE
-// =========================================================
-
-function loadAttendance() {
-
-    const month =
-        document.getElementById("attendanceMonth")?.value || "";
-
-    const employee =
-        document.getElementById("attendanceEmployee")?.value || "";
-
-    let url =
-        `${ATTENDANCE_BASE_URL}/attendance/`;
-
-    fetch(url, {
-        method: "GET",
-        headers: attendanceHeaders()
-    })
-
-        .then(response => {
-
-            if (!response.ok) {
-                throw new Error(
-                    "Attendance API Error: " + response.status
-                );
-            }
-
-            return response.json();
-
-        })
-
-        .then(data => {
-
-            console.log("Attendance API:", data);
-
-            let records =
-                Array.isArray(data)
-                    ? data
-                    : (data.results || []);
-
-            /*
-             * IMPORTANT:
-             * Backend currently does not filter month/year.
-             * So filtering is done here in frontend.
-             */
-
-            if (month) {
-
-                const [selectedYear, selectedMonth] =
-                    month.split("-");
-
-                records = records.filter(record => {
-
-                    const date =
-                        record.date ||
-                        record.attendance_date ||
-                        "";
-
-                    if (!date) {
-                        return false;
-                    }
-
-                    const recordYear =
-                        date.substring(0, 4);
-
-                    const recordMonth =
-                        date.substring(5, 7);
-
-                    return (
-                        recordYear === selectedYear &&
-                        recordMonth === selectedMonth
-                    );
-
-                });
-
-            }
-
-            if (employee) {
-
-                records = records.filter(record => {
-
-                    return String(record.employee) ===
-                        String(employee);
-
-                });
-
-            }
-
-            displayAttendance(records);
-
-        })
-
-        .catch(error => {
-
-            console.error(
-                "Attendance loading error:",
-                error
-            );
-
-        });
-}
-// =========================================================
-// DISPLAY ATTENDANCE
-// =========================================================
-
-function displayAttendance(records) {
-
-    const tbody =
-        document.getElementById("attendanceTableBody");
-
-    const empty =
-        document.getElementById("emptyAttendance");
+    suggestions.innerHTML = "";
 
 
-    if (!tbody) return;
+    if (!employees.length) {
 
+        suggestions.innerHTML = `
+            <div class="employee-suggestion-item">
+                <div class="employee-avatar-small">
+                    ?
+                </div>
 
-    tbody.innerHTML = "";
+                <div>
+                    <div class="employee-suggestion-name">
+                        No employee found
+                    </div>
+                </div>
+            </div>
+        `;
 
-
-    if (records.length === 0) {
-
-        if (empty) {
-            empty.style.display = "block";
-        }
-
-        updateStatistics([]);
+        suggestions.style.display =
+            "block";
 
         return;
 
     }
 
 
-    if (empty) {
-        empty.style.display = "none";
-    }
+    employees.forEach(
+        employee => {
+
+            const name =
+                getEmployeeName(
+                    employee
+                );
 
 
-    records.forEach(record => {
-
-        const employee =
-            record.employee_name ||
-            record.employee?.name ||
-            record.employee_name ||
-            "Employee";
+            const firstLetter =
+                name
+                    ? name.charAt(0)
+                        .toUpperCase()
+                    : "E";
 
 
-        const date =
-            record.date ||
-            record.attendance_date ||
-            "-";
+            const item =
+                document.createElement(
+                    "div"
+                );
 
 
-        const checkIn =
-            record.check_in ||
-            record.check_in_time ||
-            "-";
+            item.className =
+                "employee-suggestion-item";
 
 
-        const checkOut =
-            record.check_out ||
-            record.check_out_time ||
-            "-";
+            item.innerHTML = `
+
+                <div class="employee-avatar-small">
+                    ${firstLetter}
+                </div>
+
+                <div>
+
+                    <div class="employee-suggestion-name">
+                        ${escapeHtml(name || "Employee")}
+                    </div>
+
+                    <div class="employee-suggestion-id">
+                        Employee ID: ${employee.id}
+                    </div>
+
+                </div>
+
+            `;
 
 
-        const status =
-            record.status ||
-            "Present";
+            item.addEventListener(
+                "click",
+                function () {
 
+                    selectEmployee(
+                        employee
+                    );
 
-        const workingHours =
-            calculateWorkingHours(
-                checkIn,
-                checkOut
+                }
             );
 
 
-        const statusClass =
-            status.toLowerCase().replace(/\s+/g, "-");
+            suggestions.appendChild(
+                item
+            );
+
+        }
+    );
 
 
-        tbody.innerHTML += `
-
-            <tr>
-
-                <td>
-                    <strong>
-                        ${employee}
-                    </strong>
-                </td>
-
-                <td>
-                    ${date}
-                </td>
-
-                <td>
-                    ${checkIn}
-                </td>
-
-                <td>
-                    ${checkOut}
-                </td>
-
-                <td>
-                    ${workingHours}
-                </td>
-
-                <td>
-
-                    <span class="
-                        attendance-status
-                        ${statusClass}
-                    ">
-
-                        ${status}
-
-                    </span>
-
-                </td>
-
-                <td>
-
-                    <button
-                        class="
-                            attendance-action-btn
-                            attendance-edit-btn
-                        "
-                        onclick="editAttendance(${record.id})">
-
-                        <i class="bi bi-pencil"></i>
-
-                    </button>
-
-
-                    <button
-                        class="
-                            attendance-action-btn
-                            attendance-delete-btn
-                        "
-                        onclick="deleteAttendance(${record.id})">
-
-                        <i class="bi bi-trash"></i>
-
-                    </button>
-
-                </td>
-
-            </tr>
-
-        `;
-
-    });
-
-
-    updateStatistics(records);
+    suggestions.style.display =
+        "block";
 
 }
 
 
 // =========================================================
-// STATISTICS
+// SELECT EMPLOYEE
 // =========================================================
 
-function updateStatistics(records) {
+function selectEmployee(
+    employee
+) {
 
-    let present = 0;
-    let absent = 0;
-    let halfDay = 0;
-    let leave = 0;
-
-    records.forEach(record => {
-
-        const status =
-            (record.status || "")
-                .toLowerCase();
-
-        if (status === "present") {
-            present++;
-        }
-
-        else if (status === "absent") {
-            absent++;
-        }
-
-        else if (status === "half day") {
-            halfDay++;
-        }
-
-        else if (status === "leave") {
-            leave++;
-        }
-
-    });
-
-    const total =
-        document.getElementById("totalEmployees");
-
-    const presentElement =
-        document.getElementById("presentCount");
-
-    const absentElement =
-        document.getElementById("absentCount");
-
-    const lateElement =
-        document.getElementById("lateCount");
-
-    const leaveElement =
-        document.getElementById("leaveCount");
-
-    if (total)
-        total.innerText = records.length;
-
-    if (presentElement)
-        presentElement.innerText = present;
-
-    if (absentElement)
-        absentElement.innerText = absent;
-
-    if (lateElement)
-        lateElement.innerText = halfDay;
-
-    if (leaveElement)
-        leaveElement.innerText = leave;
-}
-
-
-// =========================================================
-// WORKING HOURS
-// =========================================================
-
-function calculateWorkingHours(checkIn, checkOut) {
-
-    if (
-        !checkIn ||
-        !checkOut ||
-        checkIn === "-" ||
-        checkOut === "-"
-    ) {
-        return "-";
-    }
-
-
-    const start =
-        new Date(`2000-01-01T${checkIn}`);
-
-    const end =
-        new Date(`2000-01-01T${checkOut}`);
-
-
-    let difference =
-        (end - start) / 1000;
-
-
-    if (difference < 0) {
-        difference += 24 * 60 * 60;
-    }
-
-
-    const hours =
-        Math.floor(difference / 3600);
-
-
-    const minutes =
-        Math.floor((difference % 3600) / 60);
-
-
-    return `${hours}h ${minutes}m`;
-
-}
-
-
-// =========================================================
-// FILTER STATUS
-// =========================================================
-
-function filterAttendance() {
-
-    const status =
+    const input =
         document.getElementById(
-            "attendanceStatus"
-        ).value.toLowerCase();
+            "attendanceEmployeeSearch"
+        );
 
+    const hidden =
+        document.getElementById(
+            "attendanceEmployeeId"
+        );
 
-    const rows =
-        document.querySelectorAll(
-            "#attendanceTableBody tr"
+    const suggestions =
+        document.getElementById(
+            "employeeSuggestions"
         );
 
 
-    rows.forEach(row => {
+    const name =
+        getEmployeeName(
+            employee
+        );
 
-        if (!status) {
 
-            row.style.display = "";
+    selectedEmployeeId =
+        String(employee.id);
 
-            return;
+
+    selectedEmployeeName =
+        name;
+
+
+    if (input) {
+
+        input.value =
+            name;
+
+    }
+
+
+    if (hidden) {
+
+        hidden.value =
+            employee.id;
+
+    }
+
+
+    if (suggestions) {
+
+        suggestions.innerHTML =
+            "";
+
+        suggestions.style.display =
+            "none";
+
+    }
+
+}
+
+
+// =========================================================
+// STATUS BUTTON
+// =========================================================
+
+function initializeStatusButton() {
+
+    const button =
+        document.getElementById(
+            "attendanceStatusButton"
+        );
+
+    const menu =
+        document.getElementById(
+            "attendanceStatusMenu"
+        );
+
+    if (!button || !menu) {
+        return;
+    }
+
+
+    button.addEventListener(
+        "click",
+        function (event) {
+
+            event.stopPropagation();
+
+            menu.classList.toggle(
+                "show"
+            );
 
         }
+    );
 
 
-        const text =
-            row.innerText.toLowerCase();
+    const statusButtons =
+        menu.querySelectorAll(
+            "button"
+        );
 
 
-        row.style.display =
-            text.includes(status)
-                ? ""
-                : "none";
+    statusButtons.forEach(
+        statusButton => {
 
-    });
+            statusButton.addEventListener(
+                "click",
+                function () {
+
+                    selectedStatus =
+                        this.dataset.status || "";
+
+
+                    const text =
+                        document.getElementById(
+                            "attendanceStatusText"
+                        );
+
+
+                    if (text) {
+
+                        text.innerText =
+                            selectedStatus ||
+                            "All Status";
+
+                    }
+
+
+                    menu.classList.remove(
+                        "show"
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    document.addEventListener(
+        "click",
+        function () {
+
+            menu.classList.remove(
+                "show"
+            );
+
+        }
+    );
 
 }
 
 
 // =========================================================
-// MODAL PREPARE
+// SEARCH BUTTON
 // =========================================================
 
-function prepareAttendanceForm() {
+function initializeSearchButton() {
 
-    document.getElementById(
-        "attendance_id"
-    ).value = "";
-
-
-    const today =
-        new Date()
-            .toISOString()
-            .split("T")[0];
-
-
-    document.getElementById(
-        "attendanceDate"
-    ).value = today;
-
-
-    document.getElementById(
-        "checkIn"
-    ).value = "";
-
-
-    document.getElementById(
-        "checkOut"
-    ).value = "";
-
-
-    document.getElementById(
-        "markStatus"
-    ).value = "Present";
-
-}
-
-
-// =========================================================
-// SAVE ATTENDANCE
-// =========================================================
-
-function saveAttendance() {
-
-    const employee =
+    const button =
         document.getElementById(
-            "markEmployee"
-        ).value;
+            "attendanceSearchBtn"
+        );
+
+    if (!button) {
+        return;
+    }
+
+
+    button.addEventListener(
+        "click",
+        async function () {
+
+            await searchAttendance();
+
+        }
+    );
+
+}
+
+
+// =========================================================
+// SEARCH ATTENDANCE
+// =========================================================
+
+async function searchAttendance() {
+
+    const employeeId =
+        document.getElementById(
+            "attendanceEmployeeId"
+        )?.value || "";
 
 
     const date =
         document.getElementById(
-            "attendanceDate"
-        ).value;
+            "attendanceDateFilter"
+        )?.value || "";
 
-
-    const checkIn =
-        document.getElementById(
-            "checkIn"
-        ).value;
-
-
-    const checkOut =
-        document.getElementById(
-            "checkOut"
-        ).value;
-
-
-    const status =
-        document.getElementById(
-            "markStatus"
-        ).value;
-
-
-    if (!employee) {
-
-        alert("Please select employee.");
-
-        return;
-
-    }
-
-
-    if (!date) {
-
-        alert("Please select attendance date.");
-
-        return;
-
-    }
-
-
-    const payload = {
-
-        employee: employee,
-
-        date: date,
-
-        check_in: checkIn || null,
-
-        check_out: checkOut || null,
-
-        status: status
-
-    };
-
-
-    fetch(
-        `${ATTENDANCE_BASE_URL}/attendance/`,
-        {
-
-            method: "POST",
-
-            headers: attendanceHeaders(),
-
-            body: JSON.stringify(payload)
-
-        }
-    )
-
-        .then(async response => {
-
-            const data =
-                await response.json();
-
-
-            if (response.ok) {
-
-                alert(
-                    "Attendance saved successfully."
-                );
-
-
-                const modal =
-                    bootstrap.Modal.getInstance(
-                        document.getElementById(
-                            "attendanceModal"
-                        )
-                    );
-
-
-                if (modal) {
-                    modal.hide();
-                }
-
-
-                loadAttendance();
-
-            }
-
-            else {
-
-                alert(
-                    "Error: " +
-                    JSON.stringify(data)
-                );
-
-            }
-
-        })
-
-        .catch(error => {
-
-            console.error(
-                "Save attendance error:",
-                error
-            );
-
-            alert(
-                "Unable to save attendance."
-            );
-
-        });
-
-}
-
-
-// =========================================================
-// DELETE
-// =========================================================
-
-function deleteAttendance(id) {
-
-    if (
-        !confirm(
-            "Are you sure you want to delete this attendance?"
-        )
-    ) {
-        return;
-    }
-
-
-    fetch(
-        `${ATTENDANCE_BASE_URL}/attendance/${id}/`,
-        {
-
-            method: "DELETE",
-
-            headers: attendanceHeaders()
-
-        }
-    )
-
-        .then(response => {
-
-            if (response.ok) {
-
-                alert(
-                    "Attendance deleted successfully."
-                );
-
-                loadAttendance();
-
-            }
-
-            else {
-
-                alert(
-                    "Failed to delete attendance."
-                );
-
-            }
-
-        })
-
-        .catch(error => {
-
-            console.error(
-                "Delete error:",
-                error
-            );
-
-        });
-
-}
-
-
-// =========================================================
-// EDIT
-// =========================================================
-
-function editAttendance(id) {
-
-    fetch(
-        `${ATTENDANCE_BASE_URL}/attendance/${id}/`,
-        {
-
-            method: "GET",
-
-            headers: attendanceHeaders()
-
-        }
-    )
-
-        .then(response => response.json())
-
-        .then(data => {
-
-            document.getElementById(
-                "attendance_id"
-            ).value = data.id;
-
-
-            document.getElementById(
-                "markEmployee"
-            ).value =
-                data.employee;
-
-
-            document.getElementById(
-                "attendanceDate"
-            ).value =
-                data.date;
-
-
-            document.getElementById(
-                "checkIn"
-            ).value =
-                data.check_in || "";
-
-
-            document.getElementById(
-                "checkOut"
-            ).value =
-                data.check_out || "";
-
-
-            document.getElementById(
-                "markStatus"
-            ).value =
-                data.status || "Present";
-
-
-            const modal =
-                new bootstrap.Modal(
-                    document.getElementById(
-                        "attendanceModal"
-                    )
-                );
-
-
-            modal.show();
-
-        })
-
-        .catch(error => {
-
-            console.error(
-                "Edit attendance error:",
-                error
-            );
-
-        });
-
-}
-
-
-// =========================================================
-// MONTHLY / YEARLY VIEW
-// =========================================================
-
-function showMonthlyView() {
-
-    document.getElementById(
-        "monthlyAttendance"
-    ).style.display = "block";
-
-
-    document.getElementById(
-        "yearlyAttendance"
-    ).style.display = "none";
-
-
-    document.getElementById(
-        "monthlyViewBtn"
-    ).classList.add("active");
-
-
-    document.getElementById(
-        "yearlyViewBtn"
-    ).classList.remove("active");
-
-}
-
-
-function showYearlyView() {
-
-    document.getElementById(
-        "monthlyAttendance"
-    ).style.display = "none";
-
-
-    document.getElementById(
-        "yearlyAttendance"
-    ).style.display = "block";
-
-
-    document.getElementById(
-        "monthlyViewBtn"
-    ).classList.remove("active");
-
-
-    document.getElementById(
-        "yearlyViewBtn"
-    ).classList.add("active");
-
-
-    loadYearlyAttendance();
-
-}
-
-
-// =========================================================
-// YEARLY ATTENDANCE
-// =========================================================
-
-function loadYearlyAttendance() {
 
     const year =
         document.getElementById(
-            "attendanceYear"
-        )?.value;
-
-    if (!year) {
-        return;
-    }
-
-    const employee =
-        document.getElementById(
-            "attendanceEmployee"
+            "attendanceYearFilter"
         )?.value || "";
 
-    fetch(
-        `${ATTENDANCE_BASE_URL}/attendance/`,
-        {
-            method: "GET",
-            headers: attendanceHeaders()
-        }
-    )
 
-        .then(response => {
+    // Employee selected?
+    selectedEmployeeId =
+        employeeId;
 
-            if (!response.ok) {
-                throw new Error(
-                    "Attendance API Error: " +
-                    response.status
-                );
-            }
 
-            return response.json();
+    // Date selected?
+    if (date) {
 
-        })
-
-        .then(data => {
-
-            let records =
-                Array.isArray(data)
-                    ? data
-                    : (data.results || []);
-
-            /*
-             * Filter selected year
-             */
-
-            records = records.filter(record => {
-
-                const date =
-                    record.date ||
-                    record.attendance_date ||
-                    "";
-
-                return date.substring(0, 4) ===
-                    String(year);
-
-            });
-
-            /*
-             * Filter employee
-             */
-
-            if (employee) {
-
-                records = records.filter(record => {
-
-                    return String(record.employee) ===
-                        String(employee);
-
-                });
-
-            }
-
-            createYearlyReport(records);
-
-        })
-
-        .catch(error => {
-
-            console.error(
-                "Yearly attendance error:",
-                error
+        const selectedDate =
+            new Date(
+                date + "T00:00:00"
             );
 
-        });
+
+        currentCalendarDate =
+            new Date(
+                selectedDate.getFullYear(),
+                selectedDate.getMonth(),
+                1
+            );
+
+    }
+
+    else if (year) {
+
+        currentCalendarDate =
+            new Date(
+                parseInt(year),
+                currentCalendarDate.getMonth(),
+                1
+            );
+
+    }
+
+
+    try {
+
+        showLoading();
+
+
+        // IMPORTANT:
+        // Backend currently does not filter
+        // query parameters.
+        // So fetch all attendance records.
+
+        const response =
+            await fetch(
+                `${ATTENDANCE_BASE_URL}/attendance/`,
+                {
+                    method: "GET",
+                    headers: attendanceHeaders()
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Attendance API Error: " +
+                response.status
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        allAttendance =
+            Array.isArray(data)
+                ? data
+                : (
+                    data.results || []
+                );
+
+
+        console.log(
+            "Attendance data:",
+            allAttendance
+        );
+
+
+        renderCalendar();
+
+
+    } catch (error) {
+
+        console.error(
+            "Attendance fetch error:",
+            error
+        );
+
+
+        showError(
+            "Unable to load attendance data."
+        );
+
+    }
+
 }
 
 
 // =========================================================
-// YEARLY REPORT
+// MONTH BUTTONS
 // =========================================================
+// =====================================================
+// SMALL MONTHLY CALENDAR
+// =====================================================
 
-function createYearlyReport(records) {
+let calendarDate = new Date();
 
-    const tbody =
-        document.getElementById(
-            "yearlyTableBody"
-        );
+function renderAttendanceCalendar(records = []) {
 
+    const calendar =
+        document.getElementById("attendanceCalendarDays");
 
-    tbody.innerHTML = "";
+    const title =
+        document.getElementById("calendarMonthTitle");
 
+    if (!calendar || !title) return;
 
-    const months = [
+    const year = calendarDate.getFullYear();
+    const month = calendarDate.getMonth();
 
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
+    const monthName = calendarDate.toLocaleString(
+        "default",
+        {
+            month: "long"
+        }
+    );
 
-    ];
+    title.innerText =
+        `${monthName} ${year}`;
 
+    calendar.innerHTML = "";
 
-    months.forEach((month, index) => {
+    // First day of month
+    const firstDay =
+        new Date(year, month, 1).getDay();
 
-        const monthNumber =
-            String(index + 1)
-                .padStart(2, "0");
+    // Total days
+    const totalDays =
+        new Date(year, month + 1, 0).getDate();
 
+    // Empty cells before first date
+    for (let i = 0; i < firstDay; i++) {
 
-        const monthRecords =
-            records.filter(record => {
+        calendar.innerHTML += `
+            <div class="calendar-day empty"></div>
+        `;
+    }
 
-                const date =
-                    record.date ||
-                    record.attendance_date ||
+    // Dates
+    for (let day = 1; day <= totalDays; day++) {
+
+        const dateString =
+            `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+        const record =
+            records.find(item => {
+
+                const recordDate =
+                    item.date ||
+                    item.attendance_date ||
                     "";
 
-
-                return date.substring(5, 7)
-                    === monthNumber;
+                return recordDate.substring(0, 10)
+                    === dateString;
 
             });
 
+        let statusClass = "no-record";
 
-        let present = 0;
-        let absent = 0;
-        let late = 0;
-        let leave = 0;
-
-
-        monthRecords.forEach(record => {
+        if (record) {
 
             const status =
-                (record.status || "")
-                    .toLowerCase();
-
+                String(record.status || "")
+                    .toLowerCase()
+                    .trim();
 
             if (status === "present") {
-                present++;
+                statusClass = "present";
             }
 
             else if (status === "absent") {
-                absent++;
-            }
-
-            else if (status === "late") {
-                late++;
+                statusClass = "absent";
             }
 
             else if (status === "leave") {
-                leave++;
+                statusClass = "leave";
             }
 
-        });
+            else if (status === "late") {
+                statusClass = "late";
+            }
+        }
+
+        calendar.innerHTML += `
+            <div class="calendar-day ${statusClass}"
+                 title="${dateString}">
+
+                <span class="calendar-day-number">
+                    ${day}
+                </span>
+
+            </div>
+        `;
+    }
+}
 
 
-        const workingDays =
-            present +
-            absent +
-            late +
-            leave;
+function initializeMonthButtons() {
+
+    const previous =
+        document.getElementById(
+            "previousMonthBtn"
+        );
+
+    const next =
+        document.getElementById(
+            "nextMonthBtn"
+        );
 
 
-        const attendancePercent =
-            workingDays > 0
-                ? Math.round(
-                    ((present + late) /
-                        workingDays) * 100
+    if (previous) {
+
+        previous.addEventListener(
+            "click",
+            function () {
+
+                currentCalendarDate =
+                    new Date(
+                        currentCalendarDate.getFullYear(),
+                        currentCalendarDate.getMonth() - 1,
+                        1
+                    );
+
+                renderCalendar();
+
+            }
+        );
+
+    }
+
+
+    if (next) {
+
+        next.addEventListener(
+            "click",
+            function () {
+
+                currentCalendarDate =
+                    new Date(
+                        currentCalendarDate.getFullYear(),
+                        currentCalendarDate.getMonth() + 1,
+                        1
+                    );
+
+                renderCalendar();
+
+            }
+        );
+
+    }
+
+}
+
+
+// =========================================================
+// VIEW BUTTONS
+// =========================================================
+
+function initializeViewButtons() {
+
+    const monthlyButton =
+        document.getElementById(
+            "monthlyViewBtn"
+        );
+
+    const yearlyButton =
+        document.getElementById(
+            "yearlyViewBtn"
+        );
+
+
+    if (monthlyButton) {
+
+        monthlyButton.addEventListener(
+            "click",
+            function () {
+
+                document.getElementById(
+                    "monthlyAttendance"
+                ).style.display = "block";
+
+
+                document.getElementById(
+                    "yearlyAttendance"
+                ).style.display = "none";
+
+
+                monthlyButton.classList.add(
+                    "active"
+                );
+
+
+                yearlyButton.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+    }
+
+
+    if (yearlyButton) {
+
+        yearlyButton.addEventListener(
+            "click",
+            function () {
+
+                document.getElementById(
+                    "monthlyAttendance"
+                ).style.display = "none";
+
+
+                document.getElementById(
+                    "yearlyAttendance"
+                ).style.display = "block";
+
+
+                monthlyButton.classList.remove(
+                    "active"
+                );
+
+
+                yearlyButton.classList.add(
+                    "active"
+                );
+
+
+                createYearlySummary();
+
+            }
+        );
+
+    }
+
+}
+
+
+// =========================================================
+// RENDER CALENDAR
+// =========================================================
+
+function renderCalendar() {
+
+    const calendar =
+        document.getElementById(
+            "attendanceCalendar"
+        );
+
+
+    const title =
+        document.getElementById(
+            "calendarMonthTitle"
+        );
+
+
+    if (!calendar || !title) {
+        return;
+    }
+
+
+    const year =
+        currentCalendarDate.getFullYear();
+
+
+    const month =
+        currentCalendarDate.getMonth();
+
+
+    const monthName =
+        currentCalendarDate.toLocaleString(
+            "default",
+            {
+                month: "long"
+            }
+        );
+
+
+    title.innerText =
+        `${monthName} ${year}`;
+
+
+    calendar.innerHTML =
+        "";
+
+
+    const firstDay =
+        new Date(
+            year,
+            month,
+            1
+        ).getDay();
+
+
+    const daysInMonth =
+        new Date(
+            year,
+            month + 1,
+            0
+        ).getDate();
+
+
+    // Date filter
+    const selectedDate =
+        document.getElementById(
+            "attendanceDateFilter"
+        )?.value || "";
+
+
+    let startDay = 1;
+
+
+    if (selectedDate) {
+
+        const filterDate =
+            new Date(
+                selectedDate + "T00:00:00"
+            );
+
+
+        if (
+            filterDate.getFullYear() === year &&
+            filterDate.getMonth() === month
+        ) {
+
+            startDay =
+                filterDate.getDate();
+
+        }
+
+    }
+
+
+    // Empty cells before first day
+    for (
+        let i = 0;
+        i < firstDay;
+        i++
+    ) {
+
+        const empty =
+            document.createElement(
+                "div"
+            );
+
+        empty.className =
+            "calendar-day empty";
+
+        calendar.appendChild(
+            empty
+        );
+
+    }
+
+
+    // Days
+    for (
+        let day = 1;
+        day <= daysInMonth;
+        day++
+    ) {
+
+        const cell =
+            document.createElement(
+                "div"
+            );
+
+
+        cell.className =
+            "calendar-day";
+
+
+        // If selected date exists,
+        // hide dates before selected date
+
+        if (day < startDay) {
+
+            cell.classList.add(
+                "empty"
+            );
+
+            cell.innerHTML =
+                "";
+
+            calendar.appendChild(
+                cell
+            );
+
+            continue;
+
+        }
+
+
+        const dateString =
+            formatDate(
+                year,
+                month,
+                day
+            );
+
+
+        const todayString =
+            getTodayString();
+
+
+        if (
+            dateString ===
+            todayString
+        ) {
+
+            cell.classList.add(
+                "today"
+            );
+
+        }
+
+
+        if (
+            selectedDate &&
+            dateString === selectedDate
+        ) {
+
+            cell.classList.add(
+                "selected-date"
+            );
+
+        }
+
+
+        const record =
+            findAttendanceRecord(
+                dateString
+            );
+
+
+        let status =
+            record
+                ? normalizeStatus(
+                    record.status
                 )
-                : 0;
+                : "No Record";
 
 
-        tbody.innerHTML += `
+        // Apply status filter
+        if (
+            selectedStatus &&
+            status !== selectedStatus
+        ) {
 
-            <tr>
+            status =
+                "No Record";
 
-                <td>
-                    <strong>
-                        ${month}
-                    </strong>
-                </td>
+        }
 
-                <td>
-                    <span class="attendance-status present">
-                        ${present}
-                    </span>
-                </td>
 
-                <td>
-                    <span class="attendance-status absent">
-                        ${absent}
-                    </span>
-                </td>
+        let statusClass =
+            "no-record";
 
-                <td>
-                    <span class="attendance-status late">
-                        ${late}
-                    </span>
-                </td>
 
-                <td>
-                    <span class="attendance-status leave">
-                        ${leave}
-                    </span>
-                </td>
+        if (
+            status === "Present"
+        ) {
 
-                <td>
-                    ${workingDays}
-                </td>
+            statusClass =
+                "present";
 
-                <td>
-                    <strong>
-                        ${attendancePercent}%
-                    </strong>
-                </td>
+        }
 
-            </tr>
+        else if (
+            status === "Absent"
+        ) {
+
+            statusClass =
+                "absent";
+
+        }
+
+        else if (
+            status === "Leave"
+        ) {
+
+            statusClass =
+                "leave";
+
+        }
+
+
+        cell.innerHTML = `
+
+            <div class="calendar-day-number">
+                ${day}
+            </div>
+
+            <div class="calendar-status ${statusClass}">
+                ${status}
+            </div>
+
+            ${record
+                ? `
+                    <div class="calendar-time">
+                        ${record.check_in
+                    ? "IN: " +
+                    formatTime(
+                        record.check_in
+                    )
+                    : ""
+                }
+                    </div>
+
+                    <div class="calendar-time">
+                        ${record.check_out
+                    ? "OUT: " +
+                    formatTime(
+                        record.check_out
+                    )
+                    : ""
+                }
+                    </div>
+                `
+                : ""
+            }
 
         `;
 
-    });
+
+        calendar.appendChild(
+            cell
+        );
+
+    }
+
+
+    updateCalendarSummary();
+
+}
+
+
+// =========================================================
+// FIND ATTENDANCE RECORD
+// =========================================================
+
+function findAttendanceRecord(
+    date
+) {
+
+    let records =
+        allAttendance.filter(
+            record => {
+
+                const recordDate =
+                    getRecordDate(
+                        record
+                    );
+
+                return (
+                    recordDate === date
+                );
+
+            }
+        );
+
+
+    // Employee filter
+    if (selectedEmployeeId) {
+
+        records =
+            records.filter(
+                record => {
+
+                    const employeeId =
+                        getRecordEmployeeId(
+                            record
+                        );
+
+                    return (
+                        String(employeeId) ===
+                        String(selectedEmployeeId)
+                    );
+
+                }
+            );
+
+    }
+
+
+    if (!records.length) {
+        return null;
+    }
+
+
+    // Status filter
+    if (selectedStatus) {
+
+        const statusRecord =
+            records.find(
+                record =>
+                    normalizeStatus(
+                        record.status
+                    ) === selectedStatus
+            );
+
+
+        return (
+            statusRecord ||
+            null
+        );
+
+    }
+
+
+    return records[0];
+
+}
+
+
+// =========================================================
+// GET RECORD DATE
+// =========================================================
+
+function getRecordDate(record) {
+
+    return (
+        record.date ||
+        record.attendance_date ||
+        ""
+    ).substring(0, 10);
+
+}
+
+
+// =========================================================
+// GET RECORD EMPLOYEE ID
+// =========================================================
+
+function getRecordEmployeeId(
+    record
+) {
+
+    if (
+        record.employee &&
+        typeof record.employee === "object"
+    ) {
+
+        return (
+            record.employee.id
+        );
+
+    }
+
+
+    return (
+        record.employee_id ||
+        record.employee
+    );
+
+}
+
+
+// =========================================================
+// NORMALIZE STATUS
+// =========================================================
+
+function normalizeStatus(status) {
+
+    const value =
+        String(
+            status || ""
+        )
+            .trim()
+            .toLowerCase();
+
+
+    if (
+        value === "present"
+    ) {
+
+        return "Present";
+
+    }
+
+
+    if (
+        value === "absent"
+    ) {
+
+        return "Absent";
+
+    }
+
+
+    if (
+        value === "leave"
+    ) {
+
+        return "Leave";
+
+    }
+
+
+    return "No Record";
+
+}
+
+
+// =========================================================
+// CALENDAR DATE FORMAT
+// =========================================================
+
+function formatDate(
+    year,
+    month,
+    day
+) {
+
+    return (
+
+        year +
+        "-" +
+        String(
+            month + 1
+        ).padStart(2, "0") +
+        "-" +
+        String(day).padStart(
+            2,
+            "0"
+        )
+
+    );
+
+}
+
+
+// =========================================================
+// TODAY
+// =========================================================
+
+function getTodayString() {
+
+    const today =
+        new Date();
+
+
+    return formatDate(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+    );
+
+}
+
+
+// =========================================================
+// FORMAT TIME
+// =========================================================
+
+function formatTime(time) {
+
+    if (!time) {
+        return "";
+    }
+
+
+    return String(time)
+        .substring(0, 5);
+
+}
+
+
+// =========================================================
+// CALENDAR SUMMARY
+// =========================================================
+
+function updateCalendarSummary() {
+
+    const year =
+        currentCalendarDate.getFullYear();
+
+
+    const month =
+        currentCalendarDate.getMonth();
+
+
+    const days =
+        new Date(
+            year,
+            month + 1,
+            0
+        ).getDate();
+
+
+    let present = 0;
+    let absent = 0;
+    let leave = 0;
+    let noRecord = 0;
+
+
+    for (
+        let day = 1;
+        day <= days;
+        day++
+    ) {
+
+        const date =
+            formatDate(
+                year,
+                month,
+                day
+            );
+
+
+        const record =
+            findAttendanceRecord(
+                date
+            );
+
+
+        if (!record) {
+
+            noRecord++;
+
+            continue;
+
+        }
+
+
+        const status =
+            normalizeStatus(
+                record.status
+            );
+
+
+        if (
+            status === "Present"
+        ) {
+
+            present++;
+
+        }
+
+        else if (
+            status === "Absent"
+        ) {
+
+            absent++;
+
+        }
+
+        else if (
+            status === "Leave"
+        ) {
+
+            leave++;
+
+        }
+
+        else {
+
+            noRecord++;
+
+        }
+
+    }
+
+
+    setText(
+        "calendarPresentCount",
+        present
+    );
+
+
+    setText(
+        "calendarAbsentCount",
+        absent
+    );
+
+
+    setText(
+        "calendarLeaveCount",
+        leave
+    );
+
+
+    setText(
+        "calendarNoRecordCount",
+        noRecord
+    );
+
+}
+
+
+// =========================================================
+// YEARLY SUMMARY
+// =========================================================
+
+function createYearlySummary() {
+
+    const selectedYear =
+        document.getElementById(
+            "attendanceYearFilter"
+        )?.value;
+
+
+    const year =
+        selectedYear
+            ? parseInt(
+                selectedYear
+            )
+            : currentCalendarDate.getFullYear();
+
+
+    let present = 0;
+    let absent = 0;
+    let leave = 0;
+
+
+    let records =
+        allAttendance.filter(
+            record => {
+
+                const date =
+                    getRecordDate(
+                        record
+                    );
+
+                return (
+                    date.startsWith(
+                        String(year)
+                    )
+                );
+
+            }
+        );
+
+
+    if (selectedEmployeeId) {
+
+        records =
+            records.filter(
+                record => {
+
+                    return (
+                        String(
+                            getRecordEmployeeId(
+                                record
+                            )
+                        ) ===
+                        String(
+                            selectedEmployeeId
+                        )
+                    );
+
+                }
+            );
+
+    }
+
+
+    records.forEach(
+        record => {
+
+            const status =
+                normalizeStatus(
+                    record.status
+                );
+
+
+            if (
+                status === "Present"
+            ) {
+
+                present++;
+
+            }
+
+            else if (
+                status === "Absent"
+            ) {
+
+                absent++;
+
+            }
+
+            else if (
+                status === "Leave"
+            ) {
+
+                leave++;
+
+            }
+
+        }
+    );
+
+
+    setText(
+        "yearPresent",
+        present
+    );
+
+
+    setText(
+        "yearAbsent",
+        absent
+    );
+
+
+    setText(
+        "yearLeave",
+        leave
+    );
+
+}
+
+
+// =========================================================
+// SET TEXT
+// =========================================================
+
+function setText(
+    id,
+    value
+) {
+
+    const element =
+        document.getElementById(id);
+
+
+    if (element) {
+
+        element.innerText =
+            value;
+
+    }
+
+}
+
+
+// =========================================================
+// ESCAPE HTML
+// =========================================================
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.innerText =
+        value || "";
+
+    return div.innerHTML;
+
+}
+
+
+// =========================================================
+// LOADING
+// =========================================================
+
+function showLoading() {
+
+    const calendar =
+        document.getElementById(
+            "attendanceCalendar"
+        );
+
+
+    if (calendar) {
+
+        calendar.innerHTML = `
+
+            <div
+                style="
+                    grid-column:1 / -1;
+                    padding:60px;
+                    text-align:center;
+                    color:#64748b;
+                "
+            >
+
+                <i
+                    class="bi bi-arrow-repeat"
+                    style="
+                        font-size:30px;
+                    "
+                ></i>
+
+                <p>
+                    Loading attendance...
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+// =========================================================
+// ERROR
+// =========================================================
+
+function showError(
+    message
+) {
+
+    const calendar =
+        document.getElementById(
+            "attendanceCalendar"
+        );
+
+
+    if (calendar) {
+
+        calendar.innerHTML = `
+
+            <div
+                style="
+                    grid-column:1 / -1;
+                    padding:60px;
+                    text-align:center;
+                    color:#dc2626;
+                "
+            >
+
+                <i
+                    class="bi bi-exclamation-circle"
+                    style="
+                        font-size:35px;
+                    "
+                ></i>
+
+                <p>
+                    ${escapeHtml(message)}
+                </p>
+
+            </div>
+
+        `;
+
+    }
 
 }
