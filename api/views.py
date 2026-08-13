@@ -74,42 +74,53 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             return Employee.objects.all()
         return Employee.objects.filter(user=user)
 
-
 class AttendanceViewSet(viewsets.ModelViewSet):
+
     queryset = Attendance.objects.all()
     serializer_class = AttendanceSerializer
     permission_classes = [AllowAny]
 
-    def _mark_unmarked_absent(self):
-        """Mark those who have not checked in by 6 PM as absent.."""
-        today = timezone.localdate()
-        current_time = timezone.localtime().time()
-        
-        if current_time >= time(18, 0, 0):
-            all_employees = Employee.objects.all()
-            for emp in all_employees:
-                
-                attendance, created = Attendance.objects.get_or_create(
-                    employee=emp,
-                    date=today,
-                    defaults={
-                        "check_in": None,
-                        "check_out": None,
-                        "status": "Absent"
-                    }
+    def get_queryset(self):
+
+        user = self.request.user
+
+        if user.is_staff:
+            queryset = Attendance.objects.all()
+
+        else:
+            try:
+                employee = Employee.objects.get(user=user)
+
+                queryset = Attendance.objects.filter(
+                    employee=employee
                 )
 
-    def get_queryset(self):
-        if self.request.user.is_staff:
-            return Attendance.objects.all().order_by("-date", "-id")
+            except Employee.DoesNotExist:
+                queryset = Attendance.objects.none()
 
-        try:
-            employee = Employee.objects.get(user=self.request.user)
-            return Attendance.objects.filter(employee=employee).order_by("-date", "-id")
-        except Employee.DoesNotExist:
-            return Attendance.objects.none()
+        # =========================
+        # EMPLOYEE FILTER
+        # =========================
 
+        employee_id = self.request.query_params.get("employee")
 
+        if employee_id:
+            queryset = queryset.filter(
+                employee_id=employee_id
+            )
+
+        # =========================
+        # FROM DATE FILTER
+        # =========================
+
+        from_date = self.request.query_params.get("from_date")
+
+        if from_date:
+            queryset = queryset.filter(
+                date__gte=from_date
+            )
+
+        return queryset.order_by("-date", "-id")
 class LeaveViewSet(viewsets.ModelViewSet):
     queryset = Leave.objects.all().order_by("-id")
     serializer_class = LeaveSerializer
