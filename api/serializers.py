@@ -11,20 +11,28 @@ class DepartmentSerializer(serializers.ModelSerializer):
         model = Department
         fields = "__all__"
 
+    def get_employee_count(self, obj):
+        return obj.employee_set.count()
+
+
+class SubDepartmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubDepartment
+        fields = "__all__"
 
 # ================= EMPLOYEE =================
 
 class EmployeeSerializer(serializers.ModelSerializer):
 
-    username = serializers.CharField(required=False)
+    username = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     password = serializers.CharField(
         write_only=True,
         required=False, allow_blank=True
     )
 
-    first_name = serializers.CharField(required=False)
-    last_name = serializers.CharField(required=False)
-    email = serializers.EmailField(required=False)
+    first_name = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    last_name = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    email = serializers.EmailField(required=False, allow_blank=True, allow_null=True)
 
     department_name = serializers.CharField(
         source="department.department_name",
@@ -37,16 +45,13 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
         fields = [
             "id",
-
             "username",
             "password",
             "first_name",
             "last_name",
             "email",
-
-           
+            "department",
             "department_name",
-
             "phone",
             "gender",
             "employment_type",
@@ -61,31 +66,38 @@ class EmployeeSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-
         data = super().to_representation(instance)
 
-        data["username"] = instance.user.username
-        data["first_name"] = instance.user.first_name
-        data["last_name"] = instance.user.last_name
-        data["email"] = instance.user.email
+        if instance.user:
+            data["username"] = instance.user.username
+            data["first_name"] = instance.user.first_name or instance.first_name or "N/A"
+            data["last_name"] = instance.user.last_name or instance.last_name or ""
+            data["email"] = instance.user.email or instance.email or "N/A"
+        else:
+            data["username"] = ""
+            data["first_name"] = instance.first_name or "N/A"
+            data["last_name"] = instance.last_name or ""
+            data["email"] = instance.email or "N/A"
 
         return data
 
     def create(self, validated_data):
+        username = validated_data.pop("username", None)
+        password = validated_data.pop("password", None)
+        
+        first_name = validated_data.get("first_name", "")
+        last_name = validated_data.get("last_name", "")
+        email = validated_data.get("email", "")
 
-        username = validated_data.pop("username")
-        password = validated_data.pop("password")
-        first_name = validated_data.pop("first_name", "")
-        last_name = validated_data.pop("last_name", "")
-        email = validated_data.pop("email", "")
-
-        user = User.objects.create_user(
-            username=username,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-            email=email
-        )
+        user = None
+        if username:
+            user = User.objects.create_user(
+                username=username,
+                password=password if password else "defaultpassword",
+                first_name=first_name if first_name else "",
+                last_name=last_name if last_name else "",
+                email=email if email else ""
+            )
 
         return Employee.objects.create(
             user=user,
@@ -93,46 +105,29 @@ class EmployeeSerializer(serializers.ModelSerializer):
         )
 
     def update(self, instance, validated_data):
-
-        user = instance.user
-
-        user.username = validated_data.pop(
-            "username",
-            user.username
-        )
-
-        user.first_name = validated_data.pop(
-            "first_name",
-            user.first_name
-        )
-
-        user.last_name = validated_data.pop(
-            "last_name",
-            user.last_name
-        )
-
-        user.email = validated_data.pop(
-            "email",
-            user.email
-        )
-
-        password = validated_data.pop(
-            "password",
-            None
-        )
-
-        if password:
-            user.set_password(password)
-
-        user.save()
+        username = validated_data.pop("username", None)
+        password = validated_data.pop("password", None)
+        
+        # User update karvo hoy to
+        if instance.user:
+            user = instance.user
+            if username:
+                user.username = username
+            if "first_name" in validated_data and validated_data["first_name"]:
+                user.first_name = validated_data["first_name"]
+            if "last_name" in validated_data and validated_data["last_name"]:
+                user.last_name = validated_data["last_name"]
+            if "email" in validated_data and validated_data["email"]:
+                user.email = validated_data["email"]
+            if password:
+                user.set_password(password)
+            user.save()
 
         for field, value in validated_data.items():
             setattr(instance, field, value)
 
         instance.save()
-
         return instance
-
 
 # ================= PROFILE =================
 

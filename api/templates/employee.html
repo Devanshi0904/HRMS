@@ -1,412 +1,328 @@
 {% extends 'base.html' %}
+
 {% load static %}
 
-{% block title %}Employee Management{% endblock %}
+
+
+{% block title %}Employee{% endblock %}
+
+
 
 {% block content %}
 
 
 
-<!-- ================= PAGE HEADER ================= -->
-<div class="employee-header">
+<div class="d-flex justify-content-between mb-3">
 
-    <div class="employee-title">
+    <h3>Employee Management</h3>
 
-        <div class="employee-title-icon">
-            <i class="bi bi-people-fill"></i>
-        </div>
 
-        <div>
-            <span class="employee-label">HRMS MANAGEMENT</span>
 
-            <h1>Employees</h1>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#employeeModal" onclick="clearForm()">
 
-            <p>
-                Manage your organization's employees
-            </p>
-        </div>
-
-    </div>
-
-    <button type="button" class="employee-add-btn" id="addEmployeeBtn" data-bs-toggle="modal"
-        data-bs-target="#employeeModal">
-        <i class="bi bi-plus-lg"></i>
         Add Employee
+
     </button>
 
 </div>
 
 
-<!-- ================= TOOLBAR ================= -->
-<div class="employee-toolbar">
 
-    <div class="employee-search">
-
-        <i class="bi bi-search"></i>
-
-        <input type="text" id="searchEmployee" placeholder="Search employee..." autocomplete="off">
-
-    </div>
+<input type="text" class="form-control mb-3" id="searchEmployee" placeholder="Search Employee"
+    onkeyup="searchEmployee()">
 
 
-    <div class="employee-filter">
 
-        <i class="bi bi-funnel"></i>
-
-        <select id="employeeDepartmentFilter">
-
-            <option value="">
-                All Departments
-            </option>
-
-        </select>
-
-    </div>
+<table class="table table-bordered table-hover">
 
 
-    <button type="button" class="refresh-btn" onclick="loadEmployees()" title="Refresh">
-        <i class="bi bi-arrow-clockwise"></i>
-    </button>
 
-</div>
+    <thead class="table-dark">
 
 
-<!-- ================= EMPLOYEE TABLE CARD ================= -->
-<div class="employee-table-card">
 
-    <div class="employee-table-header">
+        <tr>
 
-        <div>
+            <th>First_name</th>
 
-            <span class="table-label">
-                EMPLOYEE DIRECTORY
-            </span>
+            <th>Last_name</th>
 
-            <h3>
-                Employee List
-            </h3>
+            <th>Email</th>
 
-            <p>
-                View and manage all employees
-            </p>
+            <th>Department</th>
 
-        </div>
+            <th>Phone</th>
 
-        <div class="employee-status">
+            <th>Designation</th>
 
-            <span></span>
+            <th>Salary</th>
 
-            Active
+            <th>Action</th>
 
-        </div>
-
-    </div>
+        </tr>
 
 
-    <!-- TABLE -->
-    <div class="table-responsive">
 
-        <table class="employee-table">
-
-            <thead>
-
-                <tr>
-
-                    <th>ID</th>
-
-                    <th>EMPLOYEE</th>
-
-                    <th>EMAIL</th>
-
-                    <th>DEPARTMENT</th>
-
-                    <th>PHONE</th>
-
-                    <th>STATUS</th>
-
-                    <th>ACTION</th>
-
-                </tr>
-
-            </thead>
+    </thead>
 
 
-            <tbody id="employeeTableBody">
 
-                <!--
-                    Existing employee.js
-                    will load data here.
-                    -->
-
-            </tbody>
-
-        </table>
-
-    </div>
+    <tbody id="employeeTableBody">
 
 
-    <!-- EMPTY STATE -->
-    <div id="emptyEmployee" class="employee-empty" style="display:none;">
 
-        <div class="empty-icon">
-            <i class="bi bi-people"></i>
-        </div>
-
-        <h4>
-            No Employees Found
-        </h4>
-
-        <p>
-            Try another search or add a new employee.
-        </p>
-
-    </div>
-
-</div>
-
-</div>
+    </tbody>
 
 
-<!-- =====================================================
-     ADD / EDIT EMPLOYEE MODAL
-===================================================== -->
 
-<div class="modal fade" id="employeeModal" tabindex="-1" aria-hidden="true">
+</table>
 
-    <div class="modal-dialog modal-dialog-centered modal-lg">
 
-        <div class="modal-content employee-modal">
 
-            <!-- MODAL HEADER -->
+
+
+<div class="modal fade" id="employeeModal">
+
+
+
+    <div class="modal-dialog modal-lg">
+
+
+
+        <div class="modal-content">
+
+
+
             <div class="modal-header">
 
-                <div class="modal-title-area">
 
-                    <div class="modal-title-icon">
 
-                        <i class="bi bi-person-plus-fill"></i>
+                <h5>Employee</h5>
 
-                    </div>
 
-                    <div>
 
-                        <h5 class="modal-title">
-                            Add Employee
-                        </h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
 
-                        <small>
-                            Create a new employee profile
-                        </small>
 
-                    </div>
-
-                </div>
-
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 
             </div>
 
 
-            <!-- MODAL BODY -->
+
             <div class="modal-body">
 
-                <div class="employee-form-grid">
 
 
-                    <!-- FIRST NAME -->
-                    <div class="employee-form-group">
+                <input type="hidden" id="employee_id">
 
-                        <label>
-                            First Name
-                        </label>
 
-                        <div class="employee-input">
 
-                            <i class="bi bi-person"></i>
+                <div class="row">
 
-                            <input type="text" id="employeeFirstName" name="first_name" class="form-control"
-                                placeholder="Enter first name">
 
-                        </div>
+
+                    <div class="col-md-6 mb-2">
+
+                        <input class="form-control" id="first_name" placeholder="First Name">
 
                     </div>
 
 
-                    <!-- LAST NAME -->
-                    <div class="employee-form-group">
 
-                        <label>
-                            Last Name
-                        </label>
+                    <div class="col-md-6 mb-2">
 
-                        <div class="employee-input">
-
-                            <i class="bi bi-person"></i>
-
-                            <input type="text" id="employeeLastName" name="last_name" class="form-control"
-                                placeholder="Enter last name">
-
-                        </div>
+                        <input class="form-control" id="last_name" placeholder="Last Name">
 
                     </div>
 
 
-                    <!-- EMAIL -->
-                    <div class="employee-form-group">
 
-                        <label>
-                            Email
-                        </label>
+                    <div class="col-md-6 mb-2">
 
-                        <div class="employee-input">
-
-                            <i class="bi bi-envelope"></i>
-
-                            <input type="email" id="employeeEmail" name="email" class="form-control"
-                                placeholder="Enter email">
-
-                        </div>
+                        <input class="form-control" id="email" placeholder="Email">
 
                     </div>
 
 
-                    <!-- PHONE -->
-                    <div class="employee-form-group">
 
-                        <label>
-                            Phone
-                        </label>
+                    <div class="col-md-6 mb-2">
 
-                        <div class="employee-input">
-
-                            <i class="bi bi-telephone"></i>
-
-                            <input type="text" id="employeePhone" name="phone" class="form-control"
-                                placeholder="Enter phone number">
-
-                        </div>
+                        <select id="department" class="form-select"></select>
 
                     </div>
 
 
-                    <!-- DEPARTMENT -->
-                    <div class="employee-form-group">
 
-                        <label>
-                            Department
-                        </label>
+                    <div class="col-md-6 mb-2">
 
-                        <div class="employee-input">
-
-                            <i class="bi bi-building"></i>
-
-                            <select id="employeeDepartment" name="department" class="form-select">
-
-                                <option value="">
-                                    Select Department
-                                </option>
-
-                            </select>
-
-                        </div>
+                        <input class="form-control" id="phone" placeholder="Phone">
 
                     </div>
 
 
-                    <!-- DESIGNATION -->
-                    <div class="employee-form-group">
 
-                        <label>
-                            Designation
-                        </label>
+                    <div class="col-md-6 mb-2">
 
-                        <div class="employee-input">
+                        <select id="gender" class="form-select">
 
-                            <i class="bi bi-briefcase"></i>
+                            <option>Male</option>
 
-                            <input type="text" id="employeeDesignation" name="designation" class="form-control"
-                                placeholder="Enter designation">
+                            <option>Female</option>
 
-                        </div>
+                        </select>
 
                     </div>
 
 
-                    <!-- JOINING DATE -->
-                    <div class="employee-form-group">
 
-                        <label>
-                            Joining Date
-                        </label>
+                    <div class="col-md-6 mb-2">
 
-                        <div class="employee-input">
+                        <select id="employment_type" class="form-select">
 
-                            <i class="bi bi-calendar3"></i>
+                            <option>Intern</option>
 
-                            <input type="date" id="employeeJoiningDate" name="joining_date" class="form-control">
+                            <option>Trainee</option>
 
-                        </div>
+                            <option>Full Time</option>
+
+                            <option>Part Time</option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="col-md-6 mb-2">
+
+                        <input type="date" class="form-control" id="date_of_birth">
 
                     </div>
 
 
-                    <!-- STATUS -->
-                    <div class="employee-form-group">
 
-                        <label>
-                            Status
-                        </label>
+                    <div class="col-md-6 mb-2">
 
-                        <div class="employee-input">
-
-                            <i class="bi bi-toggle-on"></i>
-
-                            <select id="employeeStatus" name="status" class="form-select">
-
-                                <option value="Active">
-                                    Active
-                                </option>
-
-                                <option value="Inactive">
-                                    Inactive
-                                </option>
-
-                            </select>
-
-                        </div>
+                        <input type="date" class="form-control" id="joining_date">
 
                     </div>
+
+
+
+                    <div class="col-md-6 mb-2">
+
+                        <input class="form-control" id="designation" placeholder="Designation">
+
+                    </div>
+
+
+
+                    <div class="col-md-6 mb-2">
+
+                        <input type="number" class="form-control" id="salary" placeholder="Salary">
+
+                    </div>
+
+
+
+                    <div class="col-md-6 mb-2">
+
+                        <select id="bond_period" class="form-select">
+
+                            <option>No Bond</option>
+
+                            <option>120 Hours</option>
+
+                            <option>1 Month</option>
+
+                            <option>3 Months</option>
+
+                            <option>6 Months</option>
+
+                            <option>1 Year</option>
+
+                            <option>2 Years</option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="col-md-12 mb-2">
+
+                        <textarea id="address" class="form-control" placeholder="Address"></textarea>
+
+                    </div>
+
+
+
+                    <div class="col-md-6 mb-2">
+
+                        <input class="form-control" id="city" placeholder="City">
+
+                    </div>
+
+
+
+                    <div class="col-md-6 mb-2">
+
+                        <input class="form-control" id="state" placeholder="State">
+
+                    </div>
+
+
 
                 </div>
 
+
+
             </div>
 
 
-            <!-- MODAL FOOTER -->
+
             <div class="modal-footer">
 
-                <button type="button" class="employee-cancel-btn" data-bs-dismiss="modal">
-                    Cancel
-                </button>
 
-                <button type="button" class="employee-save-btn" id="saveEmployeeBtn">
 
-                    <i class="bi bi-check-lg"></i>
+                <button class="btn btn-success" onclick="saveEmployee()">
 
-                    Save Employee
+                    Save
 
                 </button>
+
+
+
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+
+                    Close
+
+                </button>
+
+
 
             </div>
+
+
 
         </div>
 
+
+
     </div>
+
+
 
 </div>
 
 
-<!-- EMPLOYEE JS -->
+
+{% endblock %}
+
+
+
+{% block script %}
+
 <script src="{% static 'js/employee.js' %}"></script>
 
 {% endblock %}

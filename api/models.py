@@ -8,6 +8,13 @@ class Department(models.Model):
     def __str__(self):
         return self.department_name
 
+class SubDepartment(models.Model):
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='sub_departments')
+    sub_department_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.department.department_name} - {self.sub_department_name}"
+
 class Employee(models.Model):
 
     GENDER = (
@@ -32,7 +39,10 @@ class Employee(models.Model):
         ('2 Years', '2 Years'),
     )
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    first_name = models.CharField(max_length=100, blank=True, null=True)
+    last_name = models.CharField(max_length=100, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
 
     phone = models.CharField(max_length=15)

@@ -278,3 +278,8 @@ class TaskViewSet(viewsets.ModelViewSet):
         if user.is_staff or user.is_superuser:
             return Task.objects.all().order_by('-created_at')
         return Task.objects.filter(assigned_to=user).order_by('-created_at')
+
+class SubDepartmentViewSet(viewsets.ModelViewSet):
+    queryset = SubDepartment.objects.all()
+    serializer_class = SubDepartmentSerializer
+    permission_classes = [IsAuthenticated]

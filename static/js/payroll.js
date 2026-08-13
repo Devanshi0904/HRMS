@@ -52,7 +52,6 @@ function loadPayrolls() {
 
                     tableRows += `
                     <tr>
-                        <td>${item.id}</td>
                         <td>${empName}</td>
                         <td>${monthVal}</td>
                         <td>${yearVal}</td>

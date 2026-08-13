@@ -40,7 +40,7 @@ function loadTasks() {
 
                     tableRows += `
                     <tr>
-                        <td>${task.id}</td>
+                    
                         <td><strong>${task.title}</strong><br><small class="text-muted">${task.description || ''}</small></td>
                         <td>${task.assigned_to_name || 'Employee'}</td>
                         <td><span class="badge bg-info">${task.priority}</span></td>

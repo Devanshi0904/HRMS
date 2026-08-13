@@ -4,230 +4,218 @@
 {% block title %}Departments{% endblock %}
 
 {% block content %}
+{% csrf_token %}
+<div class="container-fluid py-4">
 
-<div class="department-page">
+    <!-- TOP MODERN BANNER HEADER -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 text-white p-4"
+                style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-white text-primary p-3 rounded-4 shadow-sm fs-3 d-flex align-items-center justify-content-center"
+                            style="width: 60px; height: 60px;">
+                            <i class="bi bi-buildings-fill"></i>
+                        </div>
+                        <div>
+                            <span class="text-white-50 small text-uppercase fw-semibold">HRMS MANAGEMENT</span>
+                            <h2 class="fw-bold mb-1">Departments Directory</h2>
+                            <p class="mb-0 text-white-50">Manage organizational structure and active employee
+                                distribution.</p>
+                        </div>
+                    </div>
 
-    <!-- PAGE HEADER -->
-    <div class="department-header">
-
-        <div class="header-left">
-
-            <div class="header-icon">
-                <i class="bi bi-buildings-fill"></i>
+                    <!-- ACTION BUTTONS -->
+                    <div class="d-flex gap-2">
+                        <button type="button"
+                            class="btn btn-light text-primary fw-semibold px-4 py-2 rounded-pill shadow-sm"
+                            data-bs-toggle="modal" data-bs-target="#departmentModal">
+                            <i class="bi bi-plus-lg me-2"></i> Add Department
+                        </button>
+                        <button type="button" class="btn btn-outline-light fw-semibold px-4 py-2 rounded-pill shadow-sm"
+                            data-bs-toggle="modal" data-bs-target="#subDepartmentModal">
+                            <i class="bi bi-diagram-3 me-2"></i> Add Sub-Department
+                        </button>
+                    </div>
+                </div>
             </div>
-
-            <div>
-                <span class="page-label">HRMS MANAGEMENT</span>
-
-                <h1>Departments</h1>
-
-                <p>
-                    Manage your organization's departments
-                </p>
-            </div>
-
         </div>
-
-        <!-- Keep your existing Add button functionality here -->
-        <button type="button" class="add-department-btn" id="addDepartmentBtn" data-bs-toggle="modal"
-            data-bs-target="#departmentModal">
-
-            <i class="bi bi-plus-lg"></i>
-
-            Add Department
-
-        </button>
-
     </div>
 
-
-    <!-- SEARCH + SUMMARY -->
-    <div class="department-toolbar">
-
-        <div class="search-wrapper">
-
-            <i class="bi bi-search"></i>
-
-            <input type="text" id="searchDepartment" placeholder="Search departments..." autocomplete="off">
-
+    <!-- SEARCH TOOLBAR -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden bg-white border">
+                <span class="input-group-text bg-transparent border-0 ps-4 text-muted">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" id="searchDepartment" class="form-control border-0 shadow-none ps-2"
+                    placeholder="Search departments..." autocomplete="off" onkeyup="searchDepartment()">
+            </div>
         </div>
-
     </div>
 
-
-    <!-- DEPARTMENT TABLE -->
-    <div class="department-card">
-
-        <div class="table-heading">
-
-            <div>
-                <h3>Department List</h3>
-
-                <p>
-                    All departments available in your organization
-                </p>
-            </div>
-
-            <div class="table-status">
-                <span></span>
-                Active
-            </div>
-
+    <!-- DEPARTMENT TABLE CARD -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+        <div class="card-header bg-white py-3 px-4 border-bottom">
+            <h5 class="fw-bold text-dark mb-0">Department List</h5>
+            <p class="text-muted small mb-0">All departments available in your organization</p>
         </div>
-
 
         <div class="table-responsive">
-
-            <!-- IMPORTANT:
-                 Keep your existing table ID if department.js
-                 already uses a different ID.
-            -->
-
-            <table class="department-table">
-
-                <thead>
-
+            <table class="table align-middle mb-0">
+                <thead class="table-light text-uppercase fs-7 text-muted">
                     <tr>
-
-                        <th width="100">
-                            ID
-                        </th>
-
-                        <th>
-                            Department
-                        </th>
-
-                        <th width="220">
-                            Actions
-                        </th>
-
+                        <th class="py-3 px-4">Department</th>
+                        <th class="py-3 px-4">Employees Distribution</th>
+                        <th class="py-3 px-4 text-end" width="220">Actions</th>
                     </tr>
-
                 </thead>
-
-
                 <tbody id="departmentTableBody">
-
-                    <!--
-                    Your existing department.js should
-                    populate this section.
-                    -->
-
+                    <!-- Your original department.js will populate this automatically -->
                 </tbody>
-
             </table>
-
         </div>
-
 
         <!-- EMPTY STATE -->
-
-        <div id="emptyDepartment" class="empty-state" style="display:none;">
-
-            <div class="empty-icon">
-                <i class="bi bi-building-x"></i>
-            </div>
-
-            <h4>No Departments Found</h4>
-
-            <p>
-                Try another search or create a new department.
-            </p>
-
+        <div id="emptyDepartment" class="text-center py-5" style="display:none;">
+            <div class="text-muted fs-1 mb-3"><i class="bi bi-building-slash"></i></div>
+            <h4 class="fw-bold text-secondary">No Departments Found</h4>
+            <p class="text-muted">Try another search or create a new department.</p>
         </div>
-
     </div>
 
 </div>
 
-
-<!-- =====================================================
-     DEPARTMENT MODAL
-     ===================================================== -->
-
+<!-- ================= DEPARTMENT MODAL ================= -->
 <div class="modal fade" id="departmentModal" tabindex="-1" aria-hidden="true">
-
     <div class="modal-dialog modal-dialog-centered">
-
-        <div class="modal-content department-modal">
-
-            <div class="modal-header">
-
-                <div class="modal-title-wrapper">
-
-                    <div class="modal-icon">
-                        <i class="bi bi-building-add"></i>
-                    </div>
-
-                    <div>
-                        <h5 class="modal-title">
-                            Add Department
-                        </h5>
-
-                        <small>
-                            Create a new department
-                        </small>
-                    </div>
-
-                </div>
-
-                <button type="button" class="btn-close" data-bs-dismiss="modal">
-                </button>
-
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+            <div class="modal-header bg-light px-4 py-3 border-0">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-building-add me-2 text-primary"></i>Add Department
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-
-            <div class="modal-body">
-
+            <div class="modal-body p-4">
                 <input type="hidden" id="department_id">
-
-                <label class="form-label">
-                    Department Name
-                </label>
-
-                <div class="input-box">
-
-                    <i class="bi bi-building"></i>
-
-                    <input type="text" id="department_name" name="department_name" class="form-control"
-                        placeholder="Enter department name" autocomplete="off">
-
+                <label class="form-label fw-semibold text-secondary">Department Name</label>
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                    <span class="input-group-text bg-white border-0 text-primary"><i class="bi bi-building"></i></span>
+                    <input type="text" id="department_name" name="department_name"
+                        class="form-control border-0 shadow-none py-2" placeholder="Enter department name"
+                        autocomplete="off">
                 </div>
-
             </div>
 
-            <div class="modal-footer">
-
-                <button type="button" class="cancel-btn" data-bs-dismiss="modal">
-
-                    Cancel
-
+            <div class="modal-footer bg-light px-4 py-3 border-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                    data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" id="saveDepartmentBtn"
+                    onclick="saveDepartment()">
+                    <i class="bi bi-check-lg me-1"></i> Save Department
                 </button>
-
-                <button type="button" class="save-btn" id="saveDepartmentBtn" onclick="saveDepartment()">
-
-                    <i class="bi bi-check-lg"></i>
-
-                    Save Department
-
-                </button>
-
             </div>
-
-
-
-
         </div>
-
     </div>
-
 </div>
 
+<!-- ================= SUB-DEPARTMENT MODAL ================= -->
+<div class="modal fade" id="subDepartmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+            <div class="modal-header bg-light px-4 py-3 border-0">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-diagram-3-fill me-2 text-primary"></i>Add
+                    Sub-Department</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-secondary">Select Main Department</label>
+                    <select id="parent_department_id" class="form-select border shadow-none py-2">
+                        <option value="">Choose Department</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label fw-semibold text-secondary">Sub-Department Name</label>
+                    <input type="text" id="sub_department_name" class="form-control border shadow-none py-2"
+                        placeholder="e.g. Frontend, Backend" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="modal-footer bg-light px-4 py-3 border-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                    data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" onclick="saveSubDepartment()">
+                    <i class="bi bi-check-lg me-1"></i> Save Sub-Department
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-
+<!-- Load your original working department.js -->
 <script src="{% static 'js/department.js' %}"></script>
+
+<!-- CUSTOM SEARCH & SUB-DEPARTMENT SCRIPT -->
+<script>
+    // First-letter matching search function
+    function searchDepartment() {
+        let input = document.getElementById("searchDepartment").value.toLowerCase();
+        let rows = document.querySelectorAll("#departmentTableBody tr");
+
+        rows.forEach(row => {
+            let deptNameCell = row.querySelector("td");
+            if (deptNameCell) {
+                let deptText = deptNameCell.innerText.toLowerCase();
+                if (deptText.startsWith(input)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            }
+        });
+    }
+
+    // Sub-department save function placeholder
+    function saveSubDepartment() {
+        let deptId = document.getElementById("parent_department_id").value;
+        let subName = document.getElementById("sub_department_name").value;
+
+        if (!deptId || !subName) {
+            alert("Please fill out all fields!");
+            return;
+        }
+
+        let base = typeof BASE_URL !== 'undefined' ? BASE_URL : 'http://127.0.0.1:8000';
+        let headersObj = typeof getHeaders === 'function' ? getHeaders() : {
+            'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+            'Content-Type': 'application/json'
+        };
+
+        fetch(`${base}/sub-department/`, {
+            method: 'POST',
+            headers: headersObj,
+            body: JSON.stringify({ department: deptId, sub_department_name: subName })
+        })
+            .then(res => {
+                if (res.ok) {
+                    let modalEl = document.getElementById('subDepartmentModal');
+                    let modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+                    alert("Sub-department added successfully!");
+                    location.reload();
+                } else {
+                    alert("Error saving sub-department.");
+                }
+            })
+            .catch(err => console.error("Error:", err));
+    }
+</script>
 
 {% endblock %}

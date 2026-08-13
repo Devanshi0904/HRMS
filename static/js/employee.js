@@ -15,6 +15,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // ===================== LOAD EMPLOYEES =====================
+
+// ===================== LOAD EMPLOYEES =====================
 function loadEmployees() {
     fetch(`${BASE_URL}/employee/`, {
         method: "GET",
@@ -32,15 +34,15 @@ function loadEmployees() {
 
             let tableRows = "";
             if (employees.length === 0) {
-                tableRows = `<tr><td colspan="9" class="text-center">No Employees Found</td></tr>`;
+                tableRows = `<tr><td colspan="8" class="text-center">No Employees Found</td></tr>`;
             } else {
                 employees.forEach(emp => {
                     tableRows += `
                     <tr>
-                        <td>${emp.id}</td>
-                        <td>${emp.first_name || ''} ${emp.last_name || ''}</td>
+                        <td>${emp.first_name || '-'}</td>
+                        <td>${emp.last_name || '-'}</td>
                         <td>${emp.email || '-'}</td>
-                        <td>${emp.department_name || emp.department || '-'}</td>
+                        <td>${emp.department_name || '-'}</td>
                         <td>${emp.phone || '-'}</td>
                         <td>${emp.designation || '-'}</td>
                         <td>${emp.salary || '-'}</td>
@@ -86,8 +88,6 @@ function loadDepartment() {
 // ===================== CLEAR FORM =====================
 function clearForm() {
     document.getElementById("employee_id").value = "";
-    document.getElementById("username").value = "";
-    document.getElementById("password").value = "";
     document.getElementById("first_name").value = "";
     document.getElementById("last_name").value = "";
     document.getElementById("email").value = "";
@@ -108,7 +108,6 @@ function clearForm() {
 // ===================== GET FORM DATA =====================
 function getData() {
     let data = {
-        username: document.getElementById("username").value,
         first_name: document.getElementById("first_name").value,
         last_name: document.getElementById("last_name").value,
         email: document.getElementById("email").value,
@@ -125,12 +124,6 @@ function getData() {
         city: document.getElementById("city").value,
         state: document.getElementById("state").value
     };
-
-
-    let passVal = document.getElementById("password").value;
-    if (passVal && passVal.trim() !== "") {
-        data.password = passVal;
-    }
 
     return data;
 }
@@ -173,11 +166,18 @@ function editEmployee(id) {
         .then(res => res.json())
         .then(item => {
             document.getElementById("employee_id").value = item.id || "";
-            document.getElementById("username").value = item.username || "";
+
+            const usernameField = document.getElementById("username");
+            if (usernameField) {
+                usernameField.value = item.username || "";
+            }
+
             document.getElementById("first_name").value = item.first_name || "";
             document.getElementById("last_name").value = item.last_name || "";
             document.getElementById("email").value = item.email || "";
+
             document.getElementById("department").value = item.department || "";
+
             document.getElementById("phone").value = item.phone || "";
             document.getElementById("gender").value = item.gender || "Male";
             document.getElementById("employment_type").value = item.employment_type || "Intern";

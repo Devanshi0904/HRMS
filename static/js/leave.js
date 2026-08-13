@@ -40,7 +40,6 @@ function loadLeaves() {
 
                     tableRows += `
                     <tr>
-                        <td>${leave.id}</td>
                         <td>${empName}</td>
                         <td>${leave.leave_type || '-'}</td>
                         <td>${fromDate}</td>

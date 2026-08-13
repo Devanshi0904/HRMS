@@ -9,6 +9,7 @@ router.register("attendance", AttendanceViewSet, basename="attendance")
 router.register("leave", LeaveViewSet, basename="leave")
 router.register("payroll", PayrollViewSet, basename="payroll")
 router.register("tasks", TaskViewSet, basename="tasks")
+router.register("sub-department", SubDepartmentViewSet, basename="sub-department")
 
 
 urlpatterns = [
