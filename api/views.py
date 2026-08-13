@@ -121,6 +121,7 @@ class AttendanceViewSet(viewsets.ModelViewSet):
             )
 
         return queryset.order_by("-date", "-id")
+        
 class LeaveViewSet(viewsets.ModelViewSet):
     queryset = Leave.objects.all().order_by("-id")
     serializer_class = LeaveSerializer

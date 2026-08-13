@@ -487,10 +487,6 @@ function displayAttendance(records) {
             <tr>
 
                 <td>
-                    #${record.id || "-"}
-                </td>
-
-                <td>
                     <strong>
                         ${employee}
                     </strong>
