@@ -24,336 +24,192 @@
 
         </div>
 
-        <button class="task-add-btn" data-bs-toggle="modal" data-bs-target="#taskModal">
-
+        <button class="task-add-btn" onclick="openAddTaskModal()">
             <i class="bi bi-plus-lg"></i>
             Create Task
-
         </button>
 
     </div>
-
-
 
     <!-- TOOLBAR -->
     <div class="task-toolbar">
 
         <div class="task-search">
-
             <i class="bi bi-search"></i>
-
             <input type="text" id="searchTask" placeholder="Search task..." autocomplete="off">
-
         </div>
-
-
-        <div class="task-filter">
-
-            <i class="bi bi-funnel"></i>
-
-            <select id="taskStatusFilter">
-
-                <option value="">All Status</option>
-                <option value="Pending">Pending</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Completed">Completed</option>
-
-            </select>
-
-        </div>
-
-
-        <div class="task-filter">
-
-            <i class="bi bi-flag"></i>
-
-            <select id="taskPriorityFilter">
-
-                <option value="">All Priority</option>
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-
-            </select>
-
-        </div>
-
-
-        <button class="task-refresh-btn">
-
-            <i class="bi bi-arrow-clockwise"></i>
-
-        </button>
 
     </div>
-
 
     <!-- TABLE CARD -->
     <div class="task-table-card">
 
         <div class="task-table-header">
-
             <div>
-
-                <span class="task-table-label">
-                    TASK DIRECTORY
-                </span>
-
+                <span class="task-table-label">TASK DIRECTORY</span>
                 <h3>Employee Tasks</h3>
-
-                <p>
-                    View and manage assigned employee tasks
-                </p>
-
+                <p>View and manage assigned employee tasks</p>
             </div>
-
-
             <div class="task-status-indicator">
-
                 <span></span>
                 Task System Active
-
             </div>
-
         </div>
-
 
         <!-- TABLE -->
         <div class="table-responsive">
-
             <table class="task-table">
-
                 <thead>
-
                     <tr>
-                        <th>TASK</th>
+                        <th>TASK TITLE</th>
                         <th>ASSIGNED TO</th>
                         <th>PRIORITY</th>
                         <th>DUE DATE</th>
                         <th>STATUS</th>
+                        <th>TASK PROGRESS</th>
+                        <th>TASK REMARK</th>
                         <th>ACTION</th>
-
                     </tr>
-
                 </thead>
-
-
                 <tbody id="taskTableBody">
-
                     <!-- JS WILL LOAD TASKS -->
-
                 </tbody>
-
             </table>
-
         </div>
-
-
-        <!-- EMPTY -->
-
 
     </div>
 
 </div>
-
 
 <!-- ================= TASK MODAL ================= -->
 
 <div class="modal fade" id="taskModal" tabindex="-1">
-
     <div class="modal-dialog modal-dialog-centered modal-lg">
-
         <div class="modal-content task-modal">
-
 
             <!-- HEADER -->
             <div class="modal-header">
-
                 <div class="task-modal-title">
-
                     <div class="task-modal-icon">
                         <i class="bi bi-check2-square"></i>
                     </div>
-
                     <div>
-
-                        <h5 class="modal-title">
-                            Create Task
-                        </h5>
-
-                        <small>
-                            Assign a new task to an employee
-                        </small>
-
+                        <h5 class="modal-title">Create / Update Task</h5>
+                        <small>Assign or update task details</small>
                     </div>
-
                 </div>
-
-
-                <button type="button" class="btn-close" data-bs-dismiss="modal">
-                </button>
-
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-
 
             <!-- BODY -->
             <div class="modal-body">
+                <!-- Hidden ID for editing -->
+                <input type="hidden" id="task_id">
 
                 <div class="task-form-grid">
 
-
                     <div class="task-form-group full">
-
                         <label>Task Title</label>
-
                         <div class="task-input">
-
                             <i class="bi bi-card-heading"></i>
-
-                            <input type="text" id="taskTitle" class="form-control" placeholder="Enter task title">
-
+                            <input type="text" id="title" class="form-control" placeholder="Enter task title">
                         </div>
-
                     </div>
-
 
                     <div class="task-form-group full">
-
                         <label>Description</label>
-
                         <div class="task-input">
-
                             <i class="bi bi-text-paragraph"></i>
-
-                            <textarea id="taskDescription" class="form-control" rows="4"
+                            <textarea id="description" class="form-control" rows="3"
                                 placeholder="Describe the task..."></textarea>
-
                         </div>
-
                     </div>
 
-
                     <div class="task-form-group">
-
                         <label>Assign Employee</label>
-
                         <div class="task-input">
-
                             <i class="bi bi-person"></i>
-
                             <select id="assignedTo" class="form-select">
-
-                                <option value="">
-                                    Select Employee
-                                </option>
-
+                                <option value="">Select Employee</option>
                             </select>
-
                         </div>
-
                     </div>
 
-
                     <div class="task-form-group">
-
                         <label>Priority</label>
-
                         <div class="task-input">
-
                             <i class="bi bi-flag"></i>
-
-                            <select id="taskPriority" class="form-select">
-
+                            <select id="priority" class="form-select">
                                 <option value="Low">Low</option>
                                 <option value="Medium">Medium</option>
                                 <option value="High">High</option>
-
                             </select>
-
                         </div>
-
                     </div>
 
-
                     <div class="task-form-group">
-
                         <label>Due Date</label>
-
                         <div class="task-input">
-
                             <i class="bi bi-calendar3"></i>
-
-                            <input type="date" id="taskDueDate" class="form-control">
-
+                            <input type="date" id="due_date" class="form-control">
                         </div>
-
                     </div>
 
+                    <div class="task-form-group">
+                        <label>Status</label>
+                        <div class="task-input">
+                            <i class="bi bi-check-circle"></i>
+                            <select id="status" class="form-select">
+                                <option value="Pending">Pending</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
 
                     <div class="task-form-group">
-
-                        <label>Status</label>
-
+                        <label>Progress Percentage (%)</label>
                         <div class="task-input">
-
-                            <i class="bi bi-check-circle"></i>
-
-                            <select id="taskStatus" class="form-select">
-
-                                <option value="Pending">
-                                    Pending
-                                </option>
-
-                                <option value="In Progress">
-                                    In Progress
-                                </option>
-
-                                <option value="Completed">
-                                    Completed
-                                </option>
-
-                            </select>
-
+                            <i class="bi bi-percent"></i>
+                            <input type="number" id="progress_percentage" class="form-control" min="0" max="100"
+                                value="0">
                         </div>
+                    </div>
 
+                    <div class="task-form-group">
+                        <label>GitHub Link</label>
+                        <div class="task-input">
+                            <i class="bi bi-github"></i>
+                            <input type="url" id="github_link" class="form-control" placeholder="Optional GitHub link">
+                        </div>
+                    </div>
+
+                    <div class="task-form-group full">
+                        <label>Employee Remarks</label>
+                        <div class="task-input">
+                            <i class="bi bi-chat-left-text"></i>
+                            <textarea id="employee_remarks" class="form-control" rows="2"
+                                placeholder="Add remarks..."></textarea>
+                        </div>
                     </div>
 
                 </div>
-
             </div>
-
 
             <!-- FOOTER -->
             <div class="modal-footer">
-
-                <button class="task-cancel-btn" data-bs-dismiss="modal">
-
-                    Cancel
-
+                <button class="task-cancel-btn btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="task-save-btn btn btn-primary" onclick="saveTask()">
+                    <i class="bi bi-check-lg"></i> Save Task
                 </button>
-
-
-                <button class="task-save-btn" onclick="saveTask()">
-
-                    <i class="bi bi-check-lg"></i>
-
-                    Save Task
-
-                </button>
-
             </div>
 
         </div>
-
     </div>
-
 </div>
 
 {% endblock %}
 
-
 {% block script %}
-
 <script src="{% static 'js/task.js' %}"></script>
-
 {% endblock %}
